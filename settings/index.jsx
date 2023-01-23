@@ -141,7 +141,6 @@ function mySettings(props) {
         />
         <TextInput label="High Threshold" settingsKey="highThreshold" />
         <TextInput label="Low Threshold" settingsKey="lowThreshold" />
-        <Toggle settingsKey="disableAlert" label="Disable Alerts" />
         <Toggle
           settingsKey="extraGlucoseSettings"
           label="Extra Glucose Settings"
@@ -189,34 +188,6 @@ function mySettings(props) {
             </Section>
           ) : null
         ) : null}
-      </Section>
-
-      <Section
-        title={
-          <Text bold align="center">
-            Date/Time Settings
-          </Text>
-        }
-      >
-        <Select
-          label={`Time Format`}
-          settingsKey="timeFormat"
-          options={[
-            { name: "12hr", value: false },
-            { name: "24hr", value: true },
-          ]}
-        />
-        <Select
-          label={`Date Format`}
-          settingsKey="dateFormat"
-          options={[
-            { name: "MM/DD/YYYY", value: "MM/DD/YYYY" },
-            { name: "DD/MM/YYYY", value: "DD/MM/YYYY" },
-            { name: "YYYY/MM/DD", value: "YYYY/MM/DD" },
-            { name: "DD.MM.YYYY", value: "DD.MM.YYYY" },
-          ]}
-        />
-        <Toggle settingsKey="enableDOW" label="Day of week at end of date" />
       </Section>
 
       <Section

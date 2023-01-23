@@ -24,28 +24,6 @@
         <text class="text" id="calories" />
         <image class="stat-image" href="img/calories.png" fill="white" id="caloriesIcon" />
         
-         <!-- Alert -->
-         <svg id="popup" display="none">
-            <!-- Black background -->
-            <rect class="full-size" fill="fb-black" />
-            <!-- Title and text -->
-            <use href="#mixed-text-center-mid" class="dialog-mixed-text" id="alertHeader">
-                <set href="#top-padding" attributeName="display" to="none" />
-                <set href="#header/text" attributeName="fill" to="fb-magenta" />
-                <set href="#copy/text" attributeName="text-buffer" to="Check blood sugar!" />
-                <set href="#header/text" attributeName="text-length" to="128" />
-                <set href="#bottom-padding" attributeName="display" to="none" />
-            </use>
-            <text display="none" text-anchor="middle" id="popup-title" class="h2 text-gray">--</text>
-            <image href="img/arrows/None.png" id="alertArrows"/>
-            <!-- Right button -->
-            <use id="dismiss" class="dialog-half-button-left" href="#square-button-negative">
-                <set href="#text" attributeName="text-buffer" to="Dismiss" />
-                <set href="#text" attributeName="text-anchor" to="middle" />
-            </use>
-        </svg>
-        <!-- End Alert -->
-      
         <!-- Graph -->
         <svg id="graph">
             <line class="highLine" x1="0" y1="40%+1" x2="95%" y2="40%+1" fill="#FFA500" stroke-width="1" />
@@ -96,9 +74,6 @@
         <text text-anchor="end" class="text text-gray" id="largeGraphTimeOfLastSgv" />
         <text text-anchor="end" class="text text-gray" id="rawbg"/>
 
-        <text class="text text-gray" id="largeGraphCob" />
-        <image class="stat-image" href="img/hamburger.png" fill="white" id="largeGraphHamburger" />
-        <text class="text text-gray" id="largeGraphIob" />
         <image class="stat-image" href="img/syringe.png" fill="white" id="largeGraphSyringe" />
         <text class="text text-gray" id="tempBasal" />
         <text class="text text-gray" id="predictedBg" />

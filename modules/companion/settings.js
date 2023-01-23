@@ -203,76 +203,6 @@ export default class settings {
       );
     }
 
-    let disableAlert = null;
-    if (settingsStorage.getItem("disableAlert")) {
-      disableAlert = JSON.parse(settingsStorage.getItem("disableAlert"));
-    } else if (!disableAlert) {
-      disableAlert = false;
-    }
-
-    let highAlerts = null;
-    if (settingsStorage.getItem("highAlerts")) {
-      highAlerts = JSON.parse(settingsStorage.getItem("highAlerts"));
-    } else if (!highAlerts) {
-      highAlerts = true;
-      settingsStorage.setItem("highAlerts", true);
-    }
-
-    console.log(settingsStorage.getItem("lowAlerts"));
-    let lowAlerts = null;
-    if (settingsStorage.getItem("lowAlerts")) {
-      lowAlerts = JSON.parse(settingsStorage.getItem("lowAlerts"));
-    } else if (!lowAlerts) {
-      lowAlerts = true;
-      settingsStorage.setItem("lowAlerts", true);
-    }
-
-    let rapidRise = null;
-    if (settingsStorage.getItem("rapidRise")) {
-      rapidRise = JSON.parse(settingsStorage.getItem("rapidRise"));
-    } else if (!rapidRise) {
-      rapidRise = true;
-      settingsStorage.setItem("rapidRise", true);
-    }
-
-    let rapidFall = null;
-    if (settingsStorage.getItem("rapidFall")) {
-      rapidFall = JSON.parse(settingsStorage.getItem("rapidFall"));
-    } else if (!rapidFall) {
-      rapidFall = true;
-      settingsStorage.setItem("rapidFall", true);
-    }
-
-    let timeFormat = null;
-    if (settingsStorage.getItem("timeFormat")) {
-      timeFormat = JSON.parse(settingsStorage.getItem("timeFormat")).values[0]
-        .value;
-    } else if (!timeFormat) {
-      timeFormat = "12hr";
-      settingsStorage.setItem(
-        "timeFormat",
-        JSON.stringify({
-          selected: [0],
-          values: [{ name: timeFormat, value: false }],
-        })
-      );
-    }
-
-    let dateFormat = null;
-    if (settingsStorage.getItem("dateFormat")) {
-      dateFormat = JSON.parse(settingsStorage.getItem("dateFormat")).values[0]
-        .value;
-    } else if (!dateFormat) {
-      dateFormat = "MM/DD/YYYY";
-      settingsStorage.setItem(
-        "dateFormat",
-        JSON.stringify({
-          selected: [0],
-          values: [{ name: dateFormat, value: dateFormat }],
-        })
-      );
-    }
-
     let tempType = null;
     if (settingsStorage.getItem("tempType")) {
       tempType = JSON.parse(settingsStorage.getItem("tempType")).values[0]
@@ -460,14 +390,6 @@ export default class settings {
       settingsStorage.setItem("loopstatus", loopstatus);
     }
 
-    let enableDOW = null;
-    if (settingsStorage.getItem("enableDOW")) {
-      enableDOW = JSON.parse(settingsStorage.getItem("enableDOW"));
-    } else if (!enableDOW) {
-      enableDOW = false;
-      settingsStorage.setItem("enableDOW", enableDOW);
-    }
-
     let dexcomUsername = null;
     if (settingsStorage.getItem("dexcomUsername")) {
       console.log(settingsStorage.getItem("dexcomUsername"));
@@ -541,9 +463,6 @@ export default class settings {
       highThreshold,
       lowThreshold,
       glucoseUnits,
-      disableAlert,
-      timeFormat,
-      dateFormat,
       tempType,
       bgColor,
       bgColorTwo,
@@ -552,17 +471,12 @@ export default class settings {
       dismissLowFor,
       largeGraph,
       treatments,
-      highAlerts,
-      lowAlerts,
-      rapidRise,
-      rapidFall,
       layoutOne,
       layoutTwo,
       layoutThree,
       layoutFour,
       enableSmallGraphPrediction,
       loopstatus,
-      enableDOW,
       dexcomUsername,
       dexcomPassword,
       USAVSInternational,

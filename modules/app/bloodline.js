@@ -33,7 +33,7 @@ export default class bloodline {
   update(bloodsugars, high, low, settings) {
     let isMmol = settings.glucoseUnits === 'mmol';
     
-    console.log('app - bloodline - update()')
+    console.log('app - bloodline - update()');
     let reverseBloodsugars = bloodsugars.reverse();
    
     let predictedValues = reverseBloodsugars.filter((bg) => {

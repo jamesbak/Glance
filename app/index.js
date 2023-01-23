@@ -41,8 +41,6 @@ let largeGraphsSgv = document.getElementById("largeGraphsSgv");
 let largeGraphDelta = document.getElementById("largeGraphDelta");
 let timeOfLastSgv = document.getElementById("timeOfLastSgv");
 let largeGraphTimeOfLastSgv = document.getElementById("largeGraphTimeOfLastSgv");
-let largeGraphIob = document.getElementById("largeGraphIob");
-let largeGraphCob = document.getElementById("largeGraphCob");
 let calories = document.getElementById("calories");
 
 let dateElement = document.getElementById("date");
@@ -51,7 +49,6 @@ let largeGraphTime = document.getElementById("largeGraphTime");
 let weather = document.getElementById("weather");
 let arrows = document.getElementById("arrows");
 let largeGraphArrows = document.getElementById("largeGraphArrows");
-let alertArrows = document.getElementById("alertArrows");
 let batteryLevel = document.getElementById("battery-level");
 let steps = document.getElementById("steps");
 let stepIcon = document.getElementById("stepIcon");
@@ -60,10 +57,7 @@ let heartIcon = document.getElementById("heartIcon");
 let bgColor = document.getElementById("bgColor");
 let largeGraphBgColor = document.getElementById("largeGraphBgColor");
 let batteryPercent = document.getElementById("batteryPercent");
-let popup = document.getElementById("popup");
-let dismiss = popup.getElementById("dismiss");
 let errorText = document.getElementById("error");
-let popupTitle = document.getElementById("popup-title");
 let degreeIcon = document.getElementById("degreeIcon");
 let goToLargeGraph = document.getElementById("goToLargeGraph");
 
@@ -81,42 +75,17 @@ let dismissHighFor = 120;
 let dismissLowFor = 15;
 
 let data = null;
-let DISABLE_ALERTS = false;
 
 // Data to send back to phone
 let dataToSend = {
   heart: 0,
   steps: userActivity.get().steps,
 };
-dismiss.onclick = function (evt) {
-  console.log("DISMISS");
-  popup.style.display = "none";
-  popupTitle.style.display = "none";
-  vibration.stop();
-  DISABLE_ALERTS = true;
-  let currentBgFromBloodSugars = getFistBgNonpredictiveBG(data.bloodSugars.bgs);
-
-  if (currentBgFromBloodSugars.sgv >= parseInt(data.settings.highThreshold)) {
-    console.log("HIGH " + dismissHighFor);
-    setTimeout(disableAlertsFalse, dismissHighFor * 1000 * 60);
-  } else {
-    // 15 mins
-    console.log("LOW " + dismissLowFor);
-
-    setTimeout(disableAlertsFalse, dismissLowFor * 1000 * 60);
-  }
-};
-
-function disableAlertsFalse() {
-  DISABLE_ALERTS = false;
-}
 
 sgv.text = "---";
 rawbg.text = "";
 largeGraphDelta.text = "";
 calories.text = "--";
-largeGraphIob.text = "0.0";
-largeGraphCob.text = "0.0";
 dateElement.text = "";
 timeOfLastSgv.text = "";
 weather.text = "--";
@@ -219,30 +188,11 @@ function update() {
     let timeSenseLastSGV = dateTime.getTimeSenseLastSGV(
       currentBgFromBloodSugars.datetime
     )[1];
-    // if DISABLE_ALERTS is true check if user is in range
-    if (DISABLE_ALERTS && data.settings.resetAlertDismissal) {
-      if (
-        parseInt(timeSenseLastSGV, 10) < data.settings.staleDataAlertAfter &&
-        currentBgFromBloodSugars.direction != "DoubleDown" &&
-        currentBgFromBloodSugars.direction != "DoubleUp" &&
-        currentBgFromBloodSugars.loopstatus != "Warning"
-      ) {
-        // Dont reset alerts for LOS, DoubleUp, doubleDown, Warning
-        if (
-          currentBgFromBloodSugars.sgv > parseInt(data.settings.lowThreshold) &&
-          currentBgFromBloodSugars.sgv < parseInt(data.settings.highThreshold)
-        ) {
-          // if the BG is between the threshold
-          console.error("here", DISABLE_ALERTS, parseInt(timeSenseLastSGV, 10));
-          disableAlertsFalse();
-        }
-      }
-    }
 
     alerts.check(
       currentBgFromBloodSugars,
       data.settings,
-      DISABLE_ALERTS,
+      true,
       timeSenseLastSGV
     );
 
@@ -317,8 +267,6 @@ function setTextColor(color) {
     "largeGraphLow",
     "largeGraphDelta",
     "largeGraphTimeOfLastSgv",
-    "largeGraphIob",
-    "largeGraphCob",
     "predictedBg",
     "largeGraphTime",
     "largeGraphLoopStatus",
