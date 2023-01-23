@@ -29,7 +29,7 @@
 } 
 .h2 {
   font-size: 60;
-  font-family: SevilleSharp-Regular;
+  font-family: Tungsten-Medium;
   width: 100%;
   height: 100%;
   fill: white;
@@ -83,34 +83,34 @@
  y: 58%;
 }
 
-#cob {
+#calories {
  x: 9%;
  y: 67%;
 }
 
 #delta {
- x: 85%;
+ x: 80%;
  y: 11%;
 }
 
 #sgv {
  text-anchor:"end";
- x: 95%;
- y: 28%;
+ x: 90%;
+ y: 29%;
 }
 
 #timeOfLastSgv{
- x: 94%;
+ x: 90%;
  y: 35%;
 }
 
 #time {
  x: 3%;
- y: 47%;
+ y: 15%;
 }
 
 #arrows {
- x: 83%;
+ x: 78%;
  y: 35%;
  width: 45;
  height: 45;
@@ -234,7 +234,7 @@
  x: 3%;
  y: 53%;   
 }
-#hamburger {
+#caloriesIcon {
  x: 3%;
  y: 62%;   
 }

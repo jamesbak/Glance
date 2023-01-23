@@ -22,8 +22,8 @@ import UserActivity from "../modules/app/userActivity.js";
 import Alerts from "../modules/app/alerts.js";
 import Errors from "../modules/app/errors.js";
 import Transfer from "../modules/app/transfer.js";
-// import { preferences, save, load } from "../modules/app/sharedPreferences";
 import { memory } from "system";
+import { preferences } from "user-settings";
 
 const dateTime = new DateTime();
 const batteryLevels = new BatteryLevels();
@@ -38,16 +38,12 @@ let sgv = document.getElementById("sgv");
 let rawbg = document.getElementById("rawbg");
 let tempBasal = document.getElementById("tempBasal");
 let largeGraphsSgv = document.getElementById("largeGraphsSgv");
-let delta = document.getElementById("delta");
 let largeGraphDelta = document.getElementById("largeGraphDelta");
 let timeOfLastSgv = document.getElementById("timeOfLastSgv");
-let largeGraphTimeOfLastSgv = document.getElementById(
-  "largeGraphTimeOfLastSgv"
-);
+let largeGraphTimeOfLastSgv = document.getElementById("largeGraphTimeOfLastSgv");
 let largeGraphIob = document.getElementById("largeGraphIob");
 let largeGraphCob = document.getElementById("largeGraphCob");
-let iob = document.getElementById("iob");
-let cob = document.getElementById("cob");
+let calories = document.getElementById("calories");
 
 let dateElement = document.getElementById("date");
 let timeElement = document.getElementById("time");
@@ -78,7 +74,7 @@ let exitLargeGraph = document.getElementById("exitLargeGraph");
 let largeGraphSyringe = document.getElementById("largeGraphSyringe");
 let largeGraphHamburger = document.getElementById("largeGraphHamburger");
 let syringe = document.getElementById("syringe");
-let hamburger = document.getElementById("hamburger");
+let caloriesIcon = document.getElementById("caloriesIcon");
 let predictedBg = document.getElementById("predictedBg");
 
 let dismissHighFor = 120;
@@ -117,10 +113,8 @@ function disableAlertsFalse() {
 
 sgv.text = "---";
 rawbg.text = "";
-delta.text = "";
 largeGraphDelta.text = "";
-iob.text = "0.0";
-cob.text = "0.0";
+calories.text = "--";
 largeGraphIob.text = "0.0";
 largeGraphCob.text = "0.0";
 dateElement.text = "";
@@ -134,10 +128,6 @@ largeGraphBgColor.gradient.colors.c1 = "#390263";
 errorText.text = "";
 update();
 setInterval(update, 10000);
-
-timeElement.text = dateTime.getTime();
-largeGraphTime.text = dateTime.getTime();
-batteryLevel.width = batteryLevels.get().level;
 
 inbox.onnewfile = () => {
   console.log("New file!");
@@ -159,6 +149,18 @@ function update() {
   if (!heartrate) {
     heartrate = 0;
   }
+  var battery = batteryLevels.get();
+  batteryLevel.width = battery.level;
+  batteryLevel.style.fill = battery.color;
+  batteryPercent.text = "" + battery.percent + "%";
+  timeElement.text = dateTime.getTime(preferences.clockDisplay);
+  largeGraphTime.text = dateTime.getTime(preferences.clockDisplay);
+  dateElement.text = dateTime.getDate(null, true);
+
+  calories.text = commas(userActivity.get().calories);
+  steps.text = commas(userActivity.get().steps);
+  heart.text = userActivity.get().heartRate;
+
   // Data to send back to phone
   dataToSend = {
     heart: heartrate,
@@ -167,11 +169,6 @@ function update() {
 
   if (data) {
     console.warn("GOT DATA");
-    batteryLevel.width = batteryLevels.get().level;
-    batteryLevel.style.fill = batteryLevels.get().color;
-    batteryPercent.text = "" + batteryLevels.get().percent + "%";
-    timeElement.text = dateTime.getTime(data.settings.timeFormat);
-    largeGraphTime.text = dateTime.getTime(data.settings.timeFormat);
 
     dismissHighFor = data.settings.dismissHighFor;
     dismissLowFor = data.settings.dismissLowFor;
@@ -192,80 +189,6 @@ function update() {
     );
 
     // Layout options
-    if (
-      currentBgFromBloodSugars[data.settings.layoutOne] &&
-      data.settings.layoutOne != "iob"
-    ) {
-      iob.text = currentBgFromBloodSugars[data.settings.layoutOne];
-      syringe.style.display = "none";
-      iob.x = 10;
-    } else {
-      iob.text = commas(userActivity.get().steps);
-      syringe.style.display = "inline";
-      iob.x = 35;
-      if (currentBgFromBloodSugars.iob && currentBgFromBloodSugars.iob != 0) {
-        iob.text = currentBgFromBloodSugars.iob + "";
-        largeGraphIob.text = currentBgFromBloodSugars.iob + "";
-        syringe.style.display = "inline";
-        largeGraphSyringe.style.display = "inline";
-      } else {
-        iob.text = "";
-        largeGraphIob.text = "";
-        syringe.style.display = "none";
-        largeGraphSyringe.style.display = "none";
-      }
-    }
-
-    if (
-      currentBgFromBloodSugars[data.settings.layoutTwo] &&
-      data.settings.layoutTwo != "cob"
-    ) {
-      cob.text = currentBgFromBloodSugars[data.settings.layoutTwo];
-      hamburger.style.display = "none";
-      cob.x = 10;
-    } else {
-      cob.text = userActivity.get().heartRate;
-      hamburger.style.display = "inline";
-      cob.x = 35;
-      if (currentBgFromBloodSugars.cob && currentBgFromBloodSugars.cob != 0) {
-        cob.text = currentBgFromBloodSugars.cob + "";
-        largeGraphCob.text = currentBgFromBloodSugars.cob + "";
-        hamburger.style.display = "inline";
-        largeGraphHamburger.style.display = "inline";
-      } else {
-        cob.text = "";
-        largeGraphCob.text = "";
-        hamburger.style.display = "none";
-        largeGraphHamburger.style.display = "none";
-      }
-    }
-
-    if (
-      currentBgFromBloodSugars[data.settings.layoutThree] &&
-      data.settings.layoutThree != "steps"
-    ) {
-      steps.text = currentBgFromBloodSugars[data.settings.layoutThree];
-      stepIcon.style.display = "none";
-      steps.x = 10;
-    } else {
-      steps.text = commas(userActivity.get().steps);
-      stepIcon.style.display = "inline";
-      steps.x = 35;
-    }
-
-    if (
-      currentBgFromBloodSugars[data.settings.layoutFour] &&
-      data.settings.layoutFour != "heart"
-    ) {
-      heart.text = currentBgFromBloodSugars[data.settings.layoutFour];
-      heartIcon.style.display = "none";
-      heart.x = 10;
-    } else {
-      heart.text = userActivity.get().heartRate;
-      heartIcon.style.display = "inline";
-      heart.x = 35;
-    }
-
     sgv.text = currentBgFromBloodSugars.currentbg;
     largeGraphsSgv.text = currentBgFromBloodSugars.currentbg;
     if (currentBgFromBloodSugars.rawbg) {
@@ -292,11 +215,6 @@ function update() {
     largeGraphTimeOfLastSgv.text = dateTime.getTimeSenseLastSGV(
       currentBgFromBloodSugars.datetime
     )[0];
-
-    dateElement.text = dateTime.getDate(
-      data.settings.dateFormat,
-      data.settings.enableDOW
-    );
 
     let timeSenseLastSGV = dateTime.getTimeSenseLastSGV(
       currentBgFromBloodSugars.datetime
@@ -334,7 +252,6 @@ function update() {
     if (deltaText > 0) {
       deltaText = "+" + deltaText;
     }
-    delta.text = deltaText + " " + data.settings.glucoseUnits;
     largeGraphDelta.text = deltaText + " " + data.settings.glucoseUnits;
     largeGraphLoopStatus.text = ""; // currentBgFromBloodSugars.loopstatus;
 
@@ -366,11 +283,6 @@ function update() {
     heart.text = userActivity.get().heartRate;
     batteryLevel.width = batteryLevels.get().level;
     batteryPercent.text = "" + batteryLevels.get().percent + "%";
-
-    timeElement.text = dateTime.getTime();
-    largeGraphTime.text = dateTime.getTime();
-
-    dateElement.text = dateTime.getDate();
   }
 }
 
@@ -392,13 +304,11 @@ function getFistBgNonpredictiveBG(bgs) {
 
 function setTextColor(color) {
   let domElemets = [
-    "iob",
-    "cob",
+    "calories",
     "heart",
     "steps",
     "batteryPercent",
     "date",
-    "delta",
     "timeOfLastSgv",
     "time",
     "high",

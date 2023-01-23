@@ -24,6 +24,7 @@ export default class userActivity {
     const userActivity = {
       steps: today.adjusted.steps,
       heartRate: hrm.heartRate,
+      calories: today.adjusted.calories
     }
     return userActivity;
   }

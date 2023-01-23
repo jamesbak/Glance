@@ -1,6 +1,6 @@
 {
   "fitbit": {
-    "appUUID": "7b5d9822-7e8e-41f9-a2a7-e823548c001c",
+    "appUUID": "8be1b85c-dc61-4023-b058-4a85f07f7cf6",
     "appType": "clockface",
     "appDisplayName": "Glance",
     "iconFile": "resources/icon.png",
@@ -14,8 +14,7 @@
       "access_heart_rate"
     ],
     "buildTargets": [
-      "vulcan",
-      "atlas"
+      "mira"
     ],
     "i18n": {
       "en": {
@@ -24,12 +23,15 @@
     }
   },
   "devDependencies": {
-    "@fitbit/sdk": "~5.0.1",
+    "@fitbit/sdk": "^4.2.1",
     "@fitbit/sdk-cli": "^1.7.3"
   },
   "scripts": {
     "build": "fitbit-build",
-    "build-and-install": "printf 'build-and-install' | npx fitbit",
-    "install": "printf 'install' | npx fitbit"
+    "build-and-install": "echo 'build-and-install' | npx fitbit",
+    "install": "echo 'install' | npx fitbit"
+  },
+  "dependencies": {
+    "node-gyp": "^9.3.1"
   }
 }
