@@ -24,6 +24,7 @@ import Errors from "../modules/app/errors.js";
 import Transfer from "../modules/app/transfer.js";
 import { memory } from "system";
 import { preferences } from "user-settings";
+import Utils from "../modules/app/util.js"
 
 const dateTime = new DateTime();
 const batteryLevels = new BatteryLevels();
@@ -35,16 +36,15 @@ const transfer = new Transfer();
 
 let main = document.getElementById("main");
 let sgv = document.getElementById("sgv");
-let rawbg = document.getElementById("rawbg");
 let tempBasal = document.getElementById("tempBasal");
 let largeGraphsSgv = document.getElementById("largeGraphsSgv");
 let largeGraphDelta = document.getElementById("largeGraphDelta");
 let timeOfLastSgv = document.getElementById("timeOfLastSgv");
 let largeGraphTimeOfLastSgv = document.getElementById("largeGraphTimeOfLastSgv");
-let calories = document.getElementById("calories");
 
 let dateElement = document.getElementById("date");
-let timeElement = document.getElementById("time");
+let timeHour = document.getElementById("time-hour");
+let timeMinute = document.getElementById("time-minute");
 let largeGraphTime = document.getElementById("largeGraphTime");
 let weather = document.getElementById("weather");
 let arrows = document.getElementById("arrows");
@@ -54,6 +54,8 @@ let steps = document.getElementById("steps");
 let stepIcon = document.getElementById("stepIcon");
 let heart = document.getElementById("heart");
 let heartIcon = document.getElementById("heartIcon");
+let calories = document.getElementById("calories");
+let caloriesIcon = document.getElementById("caloriesIcon");
 let bgColor = document.getElementById("bgColor");
 let largeGraphBgColor = document.getElementById("largeGraphBgColor");
 let batteryPercent = document.getElementById("batteryPercent");
@@ -61,14 +63,11 @@ let errorText = document.getElementById("error");
 let degreeIcon = document.getElementById("degreeIcon");
 let goToLargeGraph = document.getElementById("goToLargeGraph");
 
-let largeGraphLoopStatus = document.getElementById("largeGraphLoopStatus");
 let largeGraphView = document.getElementById("largeGraphView");
 let exitLargeGraph = document.getElementById("exitLargeGraph");
 
 let largeGraphSyringe = document.getElementById("largeGraphSyringe");
 let largeGraphHamburger = document.getElementById("largeGraphHamburger");
-let syringe = document.getElementById("syringe");
-let caloriesIcon = document.getElementById("caloriesIcon");
 let predictedBg = document.getElementById("predictedBg");
 
 let dismissHighFor = 120;
@@ -83,18 +82,9 @@ let dataToSend = {
 };
 
 sgv.text = "---";
-rawbg.text = "";
 largeGraphDelta.text = "";
-calories.text = "--";
-dateElement.text = "";
 timeOfLastSgv.text = "";
-weather.text = "--";
-steps.text = "--";
-heart.text = "--";
 batteryPercent.text = "%";
-bgColor.gradient.colors.c1 = "#390263";
-largeGraphBgColor.gradient.colors.c1 = "#390263";
-errorText.text = "";
 update();
 setInterval(update, 10000);
 
@@ -122,13 +112,15 @@ function update() {
   batteryLevel.width = battery.level;
   batteryLevel.style.fill = battery.color;
   batteryPercent.text = "" + battery.percent + "%";
-  timeElement.text = dateTime.getTime(preferences.clockDisplay);
-  largeGraphTime.text = dateTime.getTime(preferences.clockDisplay);
+
+  timeHour.text = Utils.monoDigits(dateTime.getHour());
+  timeMinute.text = Utils.monoDigits(new Date().getMinutes());
+  largeGraphTime.text = dateTime.getTimeNow(preferences.clockDisplay);
   dateElement.text = dateTime.getDate(null, true);
 
-  calories.text = commas(userActivity.get().calories);
-  steps.text = commas(userActivity.get().steps);
-  heart.text = userActivity.get().heartRate;
+  calories.text = Utils.commas(userActivity.get().calories);
+  steps.text = Utils.commas(userActivity.get().steps);
+  heart.text = heartrate;
 
   // Data to send back to phone
   dataToSend = {
@@ -151,20 +143,19 @@ function update() {
     largeGraphBgColor.gradient.colors.c1 = data.settings.bgColor;
     largeGraphBgColor.gradient.colors.c2 = data.settings.bgColorTwo;
 
-    setTextColor(data.settings.textColor);
     // bloodsugars
     let currentBgFromBloodSugars = getFistBgNonpredictiveBG(
       data.bloodSugars.bgs
     );
 
-    // Layout options
     sgv.text = currentBgFromBloodSugars.currentbg;
     largeGraphsSgv.text = currentBgFromBloodSugars.currentbg;
-    if (currentBgFromBloodSugars.rawbg) {
-      rawbg.text = currentBgFromBloodSugars.rawbg + " ";
-    } else {
-      rawbg.text = "";
+    let deltaText = currentBgFromBloodSugars.bgdelta;
+    // add Plus
+    if (deltaText > 0) {
+      deltaText = "+" + deltaText;
     }
+    largeGraphDelta.text = deltaText + " " + data.settings.glucoseUnits;
 
     if (currentBgFromBloodSugars.tempbasal) {
       tempBasal.text = currentBgFromBloodSugars.tempbasal;
@@ -178,17 +169,10 @@ function update() {
       predictedBg.text = "";
     }
 
-    timeOfLastSgv.text = dateTime.getTimeSenseLastSGV(
-      currentBgFromBloodSugars.datetime
-    )[0];
-    largeGraphTimeOfLastSgv.text = dateTime.getTimeSenseLastSGV(
-      currentBgFromBloodSugars.datetime
-    )[0];
+    timeOfLastSgv.text = dateTime.getTimeSenseLastSGV(currentBgFromBloodSugars.datetime)[0];
+    largeGraphTimeOfLastSgv.text = dateTime.getTimeSenseLastSGV(currentBgFromBloodSugars.datetime)[0];
 
-    let timeSenseLastSGV = dateTime.getTimeSenseLastSGV(
-      currentBgFromBloodSugars.datetime
-    )[1];
-
+    let timeSenseLastSGV = dateTime.getTimeSenseLastSGV(currentBgFromBloodSugars.datetime)[1];
     alerts.check(
       currentBgFromBloodSugars,
       data.settings,
@@ -197,48 +181,22 @@ function update() {
     );
 
     errors.check(timeSenseLastSGV, currentBgFromBloodSugars.currentbg);
-    let deltaText = currentBgFromBloodSugars.bgdelta;
-    // add Plus
-    if (deltaText > 0) {
-      deltaText = "+" + deltaText;
-    }
-    largeGraphDelta.text = deltaText + " " + data.settings.glucoseUnits;
-    largeGraphLoopStatus.text = ""; // currentBgFromBloodSugars.loopstatus;
 
-    arrows.href =
-      "../resources/img/arrows/" + currentBgFromBloodSugars.direction + ".png";
-    largeGraphArrows.href =
-      "../resources/img/arrows/" + currentBgFromBloodSugars.direction + ".png";
+    arrows.href = "../resources/img/arrows/" + currentBgFromBloodSugars.direction + ".png";
+    largeGraphArrows.href = "../resources/img/arrows/" + currentBgFromBloodSugars.direction + ".png";
 
     graph.update(
       data.bloodSugars.bgs,
       data.settings.highThreshold,
       data.settings.lowThreshold,
-      data.settings
+      data.settings,
+      preferences.clockDisplay
     );
-
-    if (data.settings.largeGraph) {
-      goToLargeGraph.style.display = "inline";
-    } else {
-      goToLargeGraph.style.display = "none";
-    }
-    // if (data.settings.treatments) {
-    //   goToTreatment.style.display = "inline";
-    // } else {
-    //   goToTreatment.style.display = "none";
-    // }
   } else {
     console.warn("NO DATA");
-    steps.text = commas(userActivity.get().steps);
-    heart.text = userActivity.get().heartRate;
-    batteryLevel.width = batteryLevels.get().level;
-    batteryPercent.text = "" + batteryLevels.get().percent + "%";
   }
 }
 
-function commas(value) {
-  return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
 /**
  * Get Fist BG that is not a predictive BG
  * @param {Array} bgs
@@ -252,53 +210,55 @@ function getFistBgNonpredictiveBG(bgs) {
   })[0];
 }
 
-function setTextColor(color) {
-  let domElemets = [
-    "calories",
-    "heart",
-    "steps",
-    "batteryPercent",
-    "date",
-    "timeOfLastSgv",
-    "time",
-    "high",
-    "low",
-    "largeGraphHigh",
-    "largeGraphLow",
-    "largeGraphDelta",
-    "largeGraphTimeOfLastSgv",
-    "predictedBg",
-    "largeGraphTime",
-    "largeGraphLoopStatus",
-    "tempBasal",
-  ];
-  domElemets.forEach((ele) => {
-    document.getElementById(ele).style.fill = color;
-  });
+let hideGraphTimer = 0;
+
+function resetHideGraphTimer(restart = true) {
+  console.log("app - **** resetHideGraphTimer ***");
+  if (hideGraphTimer) {
+    clearTimeout(hideGraphTimer);
+    hideGraphTimer = 0;
+    console.log("app - **** timer is canceled ***");
+  }
+  if (restart) {
+    hideGraphTimer = setTimeout(hideLargeGraph, 10000);
+    console.log("app - **** new timer: " + hideGraphTimer);
+  }
 }
 
-goToLargeGraph.onclick = (e) => {
-  console.log("goToLargeGraph Activated!");
-  vibration.start("bump");
-  largeGraphView.style.display = "inline";
-  main.style.display = "none";
-};
-
-exitLargeGraph.onclick = (e) => {
-  console.log("exitLargeGraph Activated!");
-  vibration.start("bump");
-  largeGraphView.style.display = "none";
-  main.style.display = "inline";
-};
-
-timeElement.onclick = (e) => {
+function forceRefresh(e) {
   console.log("FORCE Activated!");
   transfer.send(dataToSend);
   vibration.start("bump");
   arrows.href = "../resources/img/arrows/loading.png";
   largeGraphArrows.href = "../resources/img/arrows/loading.png";
-  alertArrows.href = "../resources/img/arrows/loading.png";
-};
+  resetHideGraphTimer();
+}
+
+function showLargeGraph() {
+  console.log("goToLargeGraph Activated!");
+  vibration.start("bump");
+  largeGraphView.style.display = "inline";
+  main.style.display = "none";
+  goToLargeGraph.style.display = "none";
+  resetHideGraphTimer();
+}
+
+function hideLargeGraph() {
+  console.log("exitLargeGraph Activated!");
+  vibration.start("bump");
+  largeGraphView.style.display = "none";
+  main.style.display = "inline";
+  goToLargeGraph.style.display = "inline";
+  resetHideGraphTimer(false);
+}
+
+timeHour.onclick = forceRefresh;
+timeMinute.onclick = forceRefresh;
+largeGraphTime.onclick = forceRefresh;
+largeGraphsSgv.onclick = forceRefresh;
+
+goToLargeGraph.onclick = showLargeGraph;
+exitLargeGraph.onclick = hideLargeGraph;
 
 // wait 2 seconds
 setTimeout(function () {

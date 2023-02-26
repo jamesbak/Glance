@@ -15,41 +15,31 @@
 
 import { me as device } from "device";
 import document from "document";
+import DateTime from "./dateTime.js";
 
-let highNumber = document.getElementById("high");
-let lowNumber = document.getElementById("low");
+const dateTime = new DateTime();
+
 let largeGraphHigh = document.getElementById("largeGraphHigh");
 let largeGraphLow = document.getElementById("largeGraphLow");
+
+let largeGraphTimeStart = document.getElementById("largeGraphTimeStart");
+let largeGraphTimeMiddle = document.getElementById("largeGraphTimeMiddle");
+let largeGraphTimeEnd = document.getElementById("largeGraphTimeEnd");
 
 let meanNumber = document.getElementsByClassName("mean");
 let highLine = document.getElementsByClassName("highLine");
 let meanLine = document.getElementsByClassName("meanLine");
 let lowLine = document.getElementsByClassName("lowLine");
 
-let graphPoints = document.getElementsByClassName("graphPoints");
 let largeGraphGraphPoints = document.getElementsByClassName("largeGraphGraphPoints");
     
 export default class bloodline { 
-  update(bloodsugars, high, low, settings) {
+  update(bloodsugars, high, low, settings, timeFormat) {
     let isMmol = settings.glucoseUnits === 'mmol';
     
     console.log('app - bloodline - update()');
     let reverseBloodsugars = bloodsugars.reverse();
    
-    let predictedValues = reverseBloodsugars.filter((bg) => {
-      if (bg.p) {
-        return bg;      
-      }
-    });
-    let smallReverseBloodsugars = reverseBloodsugars.filter((bg,index) => {
-      // bg.p loop = 18 40 ar2 = 5 28
-      if(!settings.enableSmallGraphPrediction && !(bg.p) && index >= (reverseBloodsugars.length - (predictedValues.length + 24)) ) {
-        return bg;
-      } else if (index >= (reverseBloodsugars.length - 24)) {
-        return bg; 
-      }
-    });
-    
     let ymin = low;
     let ymax = high;
     let height = 100;
@@ -100,18 +90,12 @@ export default class bloodline {
     lowLine[0].y1 = lowY;
     lowLine[0].y2 = lowY;
     
-    highLine[1].y1 = highY;
-    highLine[1].y2 = highY;
-    meanLine[1].y1 = (highY + lowY)/2;
-    meanLine[1].y2 = (highY + lowY)/2;
-    lowLine[1].y1 = lowY;
-    lowLine[1].y2 = lowY;
-    
-    highNumber.y = highY;
-    lowNumber.y = lowY; 
-    
-    largeGraphHigh.y = highY;
-    largeGraphLow.y = lowY; 
+    largeGraphHigh.y = highY - 3;
+    largeGraphLow.y = lowY - 3; 
+
+    largeGraphTimeStart.y = lowY + 14;
+    largeGraphTimeMiddle.y = lowY + 14;
+    largeGraphTimeEnd.y = lowY + 14;
     
     let tempHigh = high;
     let tempLow = low; 
@@ -121,46 +105,13 @@ export default class bloodline {
       tempLow =  mmol(tempLow);
     }
     
-    highNumber.text = tempHigh;
-    lowNumber.text = tempLow;
     largeGraphHigh.text = tempHigh;
     largeGraphLow.text = tempLow;
 
-    // loop over bloodsugars and plot graph points
-    // 22 loops
-    graphPoints.forEach((point, index) => {
-      try {
-        let bg = smallReverseBloodsugars[index];
-        if(smallReverseBloodsugars[index].sgv === 'LOS') {
-          graphPoints[index].style.opacity = 0;
-        } else {
-          graphPoints[index].style.opacity = 1;
-          let pointY = (height - (height * (Math.round(((bg.sgv - ymin) / (ymax - ymin)) * 100) / 100)));
-          //  - TODO: compare time of current sgv to time of last sgv and make sure its equal 5m if not add spacing
-          graphPoints[index].cy = pointY;
-          graphPoints[index].style.fill = "#708090"; // gray
-          //  - check sgv point is in range if not change color 
-          if(bg.p) {
-            graphPoints[index].style.fill = "#f76ac5"; // pink   
-            // graphPoints[index].r = 3;
-          } else if (parseInt(bg.sgv, 10) <= low){
-            graphPoints[index].style.fill = "#de4430"; //red
-          } else if ( parseInt(bg.sgv, 10) >= high) {
-            graphPoints[index].style.fill = "orange"; // orange 
-            if ( parseInt(bg.sgv, 10) >=  (parseInt(high) + 35)) {
-               graphPoints[index].style.fill = "#de4430"; // red 
-            }
-          } else {
-            graphPoints[index].style.fill = "#75bd78"; // green 
-          } 
-        }
-      } catch(e) {
-        console.error(e)
-      }
+    largeGraphTimeStart.text = dateTime.getTime(reverseBloodsugars[0].datetime, timeFormat);
+    largeGraphTimeMiddle.text = dateTime.getTime(reverseBloodsugars[Math.floor(reverseBloodsugars.length / 2)].datetime, timeFormat);
+    largeGraphTimeEnd.text = dateTime.getTime(reverseBloodsugars[reverseBloodsugars.length - 1].datetime, timeFormat);
 
-
-    });  
-    
     // 47 loops 
     for (let index = 0; index < reverseBloodsugars.length; index++) {
       if(reverseBloodsugars[index].sgv === 'LOS') {

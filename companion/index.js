@@ -85,7 +85,7 @@ async function sendData() {
       settings: standardize.settings(store),
       // weather: values[2].query.results.channel.item.condition,
     };
-    logs.add(
+    /*logs.add(
       "Line 59: companion - sendData - DataToSend size: " +
         sizeof.size(dataToSend) +
         " bytes"
@@ -93,7 +93,7 @@ async function sendData() {
     logs.add(
       "Line 60: companion - sendData - DataToSend: " +
         JSON.stringify(dataToSend)
-    );
+    );*/
     transfer.send(dataToSend);
   });
 }

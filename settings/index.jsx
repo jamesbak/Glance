@@ -6,13 +6,14 @@ function mySettings(props) {
     <Page>
       <Text>
         <TextImageRow
-          label="Glance"
+          label="JB Glance"
           sublabel="https://github.com/Rytiggy/Glance"
           icon="https://image.ibb.co/gbWF2H/twerp_bowtie_64.png"
         />
         <Text>&nbsp;</Text>
         <Text>&nbsp;</Text>
         <Text>
+          JB Glance is a fork of the original Glance project.
           Glance is a solution for use with Fitbit devices to view your blood
           glucose levels along with a variety of other health stats on the watch
           face. You can see your stats at a glance!

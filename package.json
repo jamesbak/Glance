@@ -2,7 +2,7 @@
   "fitbit": {
     "appUUID": "8be1b85c-dc61-4023-b058-4a85f07f7cf6",
     "appType": "clockface",
-    "appDisplayName": "Glance",
+    "appDisplayName": "JB Glance",
     "iconFile": "resources/icon.png",
     "wipeColor": "#673ab7",
     "requestedPermissions": [
@@ -18,7 +18,7 @@
     ],
     "i18n": {
       "en": {
-        "name": "Glance 2.0"
+        "name": "JB Glance 2.0"
       }
     }
   },

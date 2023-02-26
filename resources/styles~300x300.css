@@ -1,6 +1,6 @@
 .text {
   font-size: 23;
-  font-family:  Colfax-Medium;
+  font-family: Colfax-Medium;
   font-weight: regular;
   width: 100%;
   height: 100%;
@@ -18,16 +18,17 @@
   text-length: 64;
 }
 
-.h2 {
-  font-size: 60;
-  font-family: Tungsten-Medium;
+.h1 {
+  font-size: 145;
+  font-family: Seville-Book;
   width: 100%;
   height: 100%;
   fill: white;
   text-length: 64;
 }
-.h1 {
-  font-size: 110;
+
+.h2 {
+  font-size: 125;
   font-family: Tungsten-Medium;
   width: 100%;
   height: 100%;
@@ -35,30 +36,31 @@
   text-length: 64;
 }
 
-.text-gray{
+.text-gray {
   fill: #B8C3C4;
 }
 
 #battery-level {
- width: 30; 
- height: 15; 
- fill: white;
- x: 3%;
- y: 4%; 
+  width: 30;
+  height: 15;
+  fill: white;
+  x: 3%;
+  y: 4%;
 }
 
 .battery-image {
- width: 32;
- height: 33;
- x: 3%;
- y: 1%;
+  width: 32;
+  height: 33;
+  x: 3%;
+  y: 1%;
 }
+
 #batteryPercent {
-/*   x: 13%-2;
+  /*   x: 13%-2;
   y: 7%+2;  */
-   x: 15%;
-   y: 8%+3;
-/*   font-size: 11;
+  x: 15%;
+  y: 8%+3;
+  /*   font-size: 11;
   fill: #7f7f7f;
   font-family: Colfax-Medium; */
 }
@@ -68,91 +70,107 @@
   y: 18%;
 }
 
+#time-hour {
+  x: 3%;
+  y: 55%;
+}
+
+#time-minute {
+  x: 3%;
+  y: 95%;
+}
+
 #error {
- x: 95%+3;
- y: 59%+2;
+  x: 95%+3;
+  y: 59%+2;
 }
 
-
- #delta {
- x: 97%;
- y: 8%+3;
+#delta {
+  x: 97%;
+  y: 8%+3;
 }
-
 
 #sgv {
- text-anchor:"end";
- x: 97%;
- y: 26%;
+  text-anchor: "end";
+  x: 97%;
+  y: 95%;
 }
 
-#timeOfLastSgv{
- x: 97%;
- y: 33%;
+#timeOfLastSgv {
+  x: 97%;
+  y: 48%;
 }
 
-#time {
- x: 3%;
- y: 58%;
+#errorLine {
+  x1: 68%;
+  y1: 45%;
+  x2: 96%;
+  y2: 45%;
+  fill: white;
 }
 
 #arrows {
- x: 83%;
- y: 32%;
- width: 45;
- height: 45;
- fill: white;
+  x: 83%;
+  y: 49%;
+  width: 45;
+  height: 45;
+  fill: white;
 }
 
 #weather {
- x: 36%;
- y: 8%+3;
+  x: 36%;
+  y: 8%+3;
 }
 
-#calories {
- x: 10%+3;
- y: 75%;
+.stat-image {
+  width: 20;
+  height: 20;
+  x: 100%-25;
 }
- 
-#steps {
- x: 10%+3;
- y: 85%+2;
-}
-#heart {
- x: 10%+3;
- y: 95%;
+
+.stat-text {
+  text-anchor: end;
+  font-size: 25;
+  x: 100%-30;
 }
 
 #stepIcon {
- x: 3%;
- y: 80%; 
+  y: 5%;
 }
+
+#steps {
+  y: 5%+18;
+}
+
 #heartIcon {
- x: 3%;
- y: 90%; 
+  y: 17%;
 }
+
+#heart {
+  y: 17%+18;
+}
+
 #caloriesIcon {
-  x: 3%;
-  y: 70%;   
- }
- .stat-image{
- width: 16;
- height: 16;
+  y: 29%;
+}
+
+#calories {
+  y: 29%+18;
 }
 
 #graph {
-  x: 49%-24; 
-  y: 60%+3; 
-  width: 175; 
+  x: 49%-24;
+  y: 60%+3;
+  width: 175;
   height: 100;
 }
 
 .graph-point {
-  fill:#b0b1b2;
+  fill: #b0b1b2;
 }
 
 .gval {
-  fill:#b0b1b2;
+  fill: #b0b1b2;
 }
 
 #dismiss {
@@ -169,20 +187,12 @@
   height: 100;
   fill: black;
 }
+
 #goToLargeGraph {
-  y: 25%;
-  x: 20%;
+  x: 97%-145;
+  y: 95%-90;
   width: 145;
   height: 90;
-  fill: black;
-}
-
-#errorLine {
-  x1: 68%;
-  y1: 19%;
-  x2: 96%;
-  y2: 19%;
-  fill: white;
 }
 
 #high {
@@ -190,15 +200,10 @@
   y: 30%;
   width: 40;
 }
-#largeGraphHigh {
-  x: 98%;
-  y: 30%;
-  width: 40;
-}
 
 #mean {
   x: 100%+9;
-  y: 65; 
+  y: 65;
 }
 
 #low {
@@ -206,9 +211,34 @@
   y: 88%;
   width: 40;
 }
+
+#largeGraphHigh {
+  x: 98%;
+  y: 30%;
+  width: 40;
+}
+
 #largeGraphLow {
   x: 97%;
   y: 88%;
+  width: 40;
+}
+
+#largeGraphTimeStart {
+  x: 0%;
+  y: 80%;
+  width: 40;
+}
+
+#largeGraphTimeMiddle {
+  x: 50%;
+  y: 80%;
+  width: 40;
+}
+
+#largeGraphTimeEnd {
+  x: 95%;
+  y: 80%;
   width: 40;
 }
 
@@ -216,18 +246,20 @@
   width: 8;
   height: 8;
   fill: #B8C3C4;
-   x: 45%;
-   y: 2%;
+  x: 45%;
+  y: 2%;
 }
 
 #syringe {
- x: 3%;
- y: 60%;   
+  x: 3%;
+  y: 60%;
 }
+
 #hamburger {
- x: 3%;
- y: 70%;   
+  x: 3%;
+  y: 70%;
 }
+
 #popup-title {
   x: 50%;
   y: 30%
@@ -246,14 +278,30 @@
 }
 
 #graphPoints {
- fill: red; 
+  fill: red;
 }
 
-.item { height: 90;  width:50; }
-.item text { font-size: 80; fill: white; x: 10;  }
+.item {
+  height: 90;
+  width: 50;
+}
 
-.itemTenth { height: 90; width:30; }
-.itemTenth text { font-size: 80; fill: white; x: 0;  }
+.item text {
+  font-size: 80;
+  fill: white;
+  x: 10;
+}
+
+.itemTenth {
+  height: 90;
+  width: 30;
+}
+
+.itemTenth text {
+  font-size: 80;
+  fill: white;
+  x: 0;
+}
 
 .treatment-image {
   width: 50;
@@ -261,37 +309,38 @@
 }
 
 #largeGraphsSgv {
- text-anchor:"end";
- x: 79%;
- y: 25%;
+  text-anchor: "end";
+  x: 79%;
+  y: 25%;
 }
 
 #largeGraphArrows {
- x: 83%;
- y: 11%;
- width: 45;
- height: 45;
- fill: white;
+  x: 83%;
+  y: 11%;
+  width: 45;
+  height: 45;
+  fill: white;
 }
 
 #largeGraphDelta {
- x: 97%;
- y: 8%+3;
+  x: 97%;
+  y: 8%+3;
 }
+
 #largeGraphTimeOfLastSgv {
- x: 97%;
- y: 33%;
+  x: 97%;
+  y: 33%;
 }
 
 #rawbg {
- x: 97%;
- y: 40%;
+  x: 97%;
+  y: 40%;
 }
 
 #largeGraph {
   y: 61%;
   x: 3%;
-  width:97%;
+  width: 97%;
 }
 
 #exitLargeGraph {
@@ -304,31 +353,33 @@
 
 
 #largeGraphSyringe {
- x: 3%;
- y: 4%;   
+  x: 3%;
+  y: 4%;
 }
+
 #largeGraphHamburger {
- x: 3%;
- y: 12%;   
+  x: 3%;
+  y: 12%;
 }
+
 #largeGraphIob {
- x: 10%;
- y: 8%+4;
+  x: 10%;
+  y: 8%+4;
 }
 
 #largeGraphCob {
- x: 10%;
- y: 17%;
+  x: 10%;
+  y: 17%;
 }
 
 #predictedBg {
- x: 3%;
- y: 25%;
+  x: 3%;
+  y: 25%;
 }
 
 #tempBasal {
- x: 3%;
- y: 33%;
+  x: 3%;
+  y: 33%;
 }
 
 #largeGraphTime {
@@ -350,9 +401,9 @@
 }
 
 #alertArrows {
- x: 70%;
- y: 15%;
- width: 45;
- height: 45;
- fill: white;
+  x: 70%;
+  y: 15%;
+  width: 45;
+  height: 45;
+  fill: white;
 }

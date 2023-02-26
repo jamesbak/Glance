@@ -11,6 +11,8 @@
  * ------------------------------------------------
  */
 
+import { preferences, locale } from "user-settings";
+
 export default class dateTime {
   getDate(dateFormat, enableDOW) {
     console.log("app - dateTime - getDate()");
@@ -18,7 +20,7 @@ export default class dateTime {
     let month = ("0" + (dateObj.getMonth() + 1)).slice(-2);
     let date = ("0" + dateObj.getDate()).slice(-2);
     let year = dateObj.getFullYear();
-    let days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
     if (enableDOW) {
       year = year.toString().substr(-2);
@@ -42,24 +44,42 @@ export default class dateTime {
     return shortDate;
   }
 
-  getTime(timeFormat) {
-    console.log("app - dateTime - getTime()");
-    let timeNow = new Date();
-    let hh = timeNow.getHours();
-    let mm = timeNow.getMinutes();
-    let ss = timeNow.getSeconds();
-    if (!timeFormat) {
-      let formatAMPM = hh >= 12 ? "PM" : "AM";
-      hh = hh % 12 || 12;
+  getTimeNow(timeFormat) {
+    return this.getTime(Date.now(), timeFormat);
+  }
 
-      // if(hh < 10) {
-      //   hh = '0' + hh;
-      // }
+  getTime(value, timeFormat) {
+    console.log("app - dateTime - getTime()");
+    var time = new Date(value);
+    var hh = time.getHours();
+    var mm = time.getMinutes();
+    var suffix = "";
+    var hourPad = 0;
+    if (timeFormat === "12h") {
+      suffix = hh >= 12 ? " PM" : " AM";
+      hh = hh % 12 || 12;
+    } else {
+      hh = ("0" + hh).slice(-2);
     }
-    if (mm < 10) {
-      mm = "0" + mm;
+    var ret = hh + ":" + ("0" + mm).slice(-2) + suffix;
+    return ret;
+  }
+
+  getHour() {
+    console.log("app - dateTime - getHour()");
+    var timeNow = new Date();
+    var hh = timeNow.getHours();
+    if (preferences.clockDisplay === "12h") {
+      hh = hh % 12 || 12;
     }
-    return hh + ":" + mm;
+    return hh;
+  }
+
+  getMinute() {
+    console.log("app - dateTime - getMinute()");
+    var timeNow = new Date();
+    var mm = timeNow.getMinutes();
+    return ("0" + mm).slice(-2);
   }
 
   getTimeSenseLastSGV(sgvDateTime) {

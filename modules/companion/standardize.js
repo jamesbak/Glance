@@ -335,7 +335,7 @@ export default class standardize {
 				return bg;
 			});
 
-			logs.add('Line 151:  companion - standardize cleanedBgs' + JSON.stringify(cleanedBgs))
+			//logs.add('Line 151:  companion - standardize cleanedBgs' + JSON.stringify(cleanedBgs))
 
 			let returnBloodsugars = {
 				bgs: cleanedBgs,

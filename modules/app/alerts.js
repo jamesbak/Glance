@@ -44,21 +44,16 @@ export default class alerts {
       sgv.style.fill = "#de4430";
       largeGraphsSgv.style.fill = "#de4430";
 
-      popupTitle.style.fill = "#de4430";
-      errorLine.style.fill = "#de4430";
-      // largeGraphErrorLine.style.fill ="#de4430";
     }
     if (bg.sgv >= parseInt(settings.highThreshold) && !staleData) {
       sgv.style.fill = "orange";
       largeGraphsSgv.style.fill = "orange";
 
-      popupTitle.style.fill = "orange";
       errorLine.style.fill = "orange";
       // largeGraphErrorLine.style.fill ="orange";
       if (bg.sgv >= parseInt(settings.highThreshold) + 35) {
         sgv.style.fill = "#de4430";
         largeGraphsSgv.style.fill = "#de4430";
-        popupTitle.style.fill = "#de4430";
         errorLine.style.fill = "#de4430";
         // largeGraphErrorLine.style.fill ="#de4430";
       }
