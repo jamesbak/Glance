@@ -5,8 +5,6 @@
         <rect id="battery-level" />
         <image class="battery-image" href="img/battery.png" fill="white" />
         <text text-anchor="start" class="text text-gray" id="batteryPercent">99</text>
-        <text text-anchor="start" class="text text-gray" id="weather">--</text>
-        <image href="img/degree.png" id="degreeIcon" />
         <text text-anchor="start" class="text text-gray" id="date" />
         <line stroke-width="4" id="errorLine" display="none" />
 

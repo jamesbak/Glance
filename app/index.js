@@ -15,10 +15,13 @@ import document from "document";
 import { inbox } from "file-transfer";
 import fs from "fs";
 import { vibration } from "haptics";
+import { clock } from "clock";
+import { HeartRateSensor } from "heart-rate";
+import { display } from "display";
+import { today } from 'user-activity';
 import DateTime from "../modules/app/dateTime.js";
 import BatteryLevels from "../modules/app/batteryLevels.js";
 import Graph from "../modules/app/bloodline.js";
-import UserActivity from "../modules/app/userActivity.js";
 import Alerts from "../modules/app/alerts.js";
 import Errors from "../modules/app/errors.js";
 import Transfer from "../modules/app/transfer.js";
@@ -29,7 +32,6 @@ import Utils from "../modules/app/util.js"
 const dateTime = new DateTime();
 const batteryLevels = new BatteryLevels();
 const graph = new Graph();
-const userActivity = new UserActivity();
 const alerts = new Alerts();
 const errors = new Errors();
 const transfer = new Transfer();
@@ -46,7 +48,6 @@ let dateElement = document.getElementById("date");
 let timeHour = document.getElementById("time-hour");
 let timeMinute = document.getElementById("time-minute");
 let largeGraphTime = document.getElementById("largeGraphTime");
-let weather = document.getElementById("weather");
 let arrows = document.getElementById("arrows");
 let largeGraphArrows = document.getElementById("largeGraphArrows");
 let batteryLevel = document.getElementById("battery-level");
@@ -73,21 +74,41 @@ let predictedBg = document.getElementById("predictedBg");
 let dismissHighFor = 120;
 let dismissLowFor = 15;
 
-let data = null;
+// Data received from companion app
+let dataFromCompanion = null;
 
 // Data to send back to phone
 let dataToSend = {
   heart: 0,
-  steps: userActivity.get().steps,
+  steps: today.adjusted.steps,
 };
 
 sgv.text = "---";
 largeGraphDelta.text = "";
 timeOfLastSgv.text = "";
 batteryPercent.text = "%";
-update();
-setInterval(update, 10000);
 
+// Setup change event for all non-BG metrics
+// Clock - steps & calories are also refreshed on this event
+clock.granularity = "seconds";
+clock.ontick = (evt) => {
+  updateNonBgMetrics(evt.date, false);
+}
+// Heart rate sensor
+const hrm = new HeartRateSensor({ frequency: 1 });
+hrm.addEventListener("reading", () => updateHeartRate(hrm.heartRate));
+hrm.start();
+// Turn some metrics off when the display isn't on
+display.addEventListener("change", () => {
+  // Automatically stop the sensor when the screen is off to conserve battery
+  display.on ? hrm.start() : hrm.stop();
+  clock.granularity = display.on ? "seconds" : "off";
+  // Refresh the display now
+  if (display.on) {
+    updateNonBgMetrics(new Date(), true);
+  }
+});
+// Data received from companion app
 inbox.onnewfile = () => {
   console.log("New file!");
   let fileName;
@@ -95,57 +116,53 @@ inbox.onnewfile = () => {
     // If there is a file, move it from staging into the application folder
     fileName = inbox.nextFile();
     if (fileName) {
-      data = fs.readFileSync(fileName, "cbor");
+      dataFromCompanion = fs.readFileSync(fileName, "cbor");
       update();
     }
   } while (fileName);
 };
+// User interaction - force refresh & show graph
+timeHour.onclick = forceRefresh;
+timeMinute.onclick = forceRefresh;
+largeGraphTime.onclick = forceRefresh;
+largeGraphsSgv.onclick = forceRefresh;
+
+goToLargeGraph.onclick = showLargeGraph;
+exitLargeGraph.onclick = hideLargeGraph;
+
+updateNonBgMetrics(new Date(), true);
+// Timed refresh
+// wait 1 seconds
+setTimeout(() => transfer.send(dataToSend), 1000);
+// Refresh BSL every 3 minutes
+setInterval(() => transfer.send(dataToSend), 180000);
 
 function update() {
   console.log("app - update()");
   console.warn("JS memory: " + memory.js.used + "/" + memory.js.total);
-  let heartrate = userActivity.get().heartRate;
-  if (!heartrate) {
-    heartrate = 0;
-  }
-  var battery = batteryLevels.get();
-  batteryLevel.width = battery.level;
-  batteryLevel.style.fill = battery.color;
-  batteryPercent.text = "" + battery.percent + "%";
-
-  timeHour.text = Utils.monoDigits(dateTime.getHour());
-  timeMinute.text = Utils.monoDigits(new Date().getMinutes());
-  largeGraphTime.text = dateTime.getTimeNow(preferences.clockDisplay);
-  dateElement.text = dateTime.getDate(null, true);
-
-  calories.text = Utils.commas(userActivity.get().calories);
-  steps.text = Utils.commas(userActivity.get().steps);
-  heart.text = heartrate;
 
   // Data to send back to phone
   dataToSend = {
-    heart: heartrate,
-    steps: userActivity.get().steps,
+    heart: hrm.heartRate,
+    steps: today.adjusted.steps,
   };
 
-  if (data) {
+  if (dataFromCompanion) {
     console.warn("GOT DATA");
 
-    dismissHighFor = data.settings.dismissHighFor;
-    dismissLowFor = data.settings.dismissLowFor;
-    weather.text = ""; // data.weather.temp;
-    degreeIcon.style.display = "none";
+    dismissHighFor = dataFromCompanion.settings.dismissHighFor;
+    dismissLowFor = dataFromCompanion.settings.dismissLowFor;
 
     // colors
-    bgColor.gradient.colors.c1 = data.settings.bgColor;
-    bgColor.gradient.colors.c2 = data.settings.bgColorTwo;
+    bgColor.gradient.colors.c1 = dataFromCompanion.settings.bgColor;
+    bgColor.gradient.colors.c2 = dataFromCompanion.settings.bgColorTwo;
 
-    largeGraphBgColor.gradient.colors.c1 = data.settings.bgColor;
-    largeGraphBgColor.gradient.colors.c2 = data.settings.bgColorTwo;
+    largeGraphBgColor.gradient.colors.c1 = dataFromCompanion.settings.bgColor;
+    largeGraphBgColor.gradient.colors.c2 = dataFromCompanion.settings.bgColorTwo;
 
     // bloodsugars
     let currentBgFromBloodSugars = getFistBgNonpredictiveBG(
-      data.bloodSugars.bgs
+      dataFromCompanion.bloodSugars.bgs
     );
 
     sgv.text = currentBgFromBloodSugars.currentbg;
@@ -155,7 +172,7 @@ function update() {
     if (deltaText > 0) {
       deltaText = "+" + deltaText;
     }
-    largeGraphDelta.text = deltaText + " " + data.settings.glucoseUnits;
+    largeGraphDelta.text = deltaText + " " + dataFromCompanion.settings.glucoseUnits;
 
     if (currentBgFromBloodSugars.tempbasal) {
       tempBasal.text = currentBgFromBloodSugars.tempbasal;
@@ -175,7 +192,7 @@ function update() {
     let timeSenseLastSGV = dateTime.getTimeSenseLastSGV(currentBgFromBloodSugars.datetime)[1];
     alerts.check(
       currentBgFromBloodSugars,
-      data.settings,
+      dataFromCompanion.settings,
       true,
       timeSenseLastSGV
     );
@@ -186,15 +203,64 @@ function update() {
     largeGraphArrows.href = "../resources/img/arrows/" + currentBgFromBloodSugars.direction + ".png";
 
     graph.update(
-      data.bloodSugars.bgs,
-      data.settings.highThreshold,
-      data.settings.lowThreshold,
-      data.settings,
+      dataFromCompanion.bloodSugars.bgs,
+      dataFromCompanion.settings.highThreshold,
+      dataFromCompanion.settings.lowThreshold,
+      dataFromCompanion.settings,
       preferences.clockDisplay
     );
   } else {
     console.warn("NO DATA");
   }
+}
+
+let currentSteps = 0;
+let currentCalories = 0;
+function updateNonBgMetrics(date, force) {
+  if (force || date.getSeconds() % 10 == 0) {
+    console.log("app - updating clock");
+    updateClock(date);
+    updateBattery(batteryLevels.get());
+  }
+  if (force || today.adjusted.steps != currentSteps) {
+    console.log("app - updating steps");
+    updateSteps(today.adjusted.steps);
+    currentSteps = today.adjusted.steps;
+  }
+  if (force || today.adjusted.calories != currentCalories) {
+    console.log("app - updating calories");
+    updateCalories(today.adjusted.calories);
+    currentCalories = today.adjusted.calories;
+  }
+}
+
+function updateClock(date) {
+  console.log("app - updateClock()");
+  timeHour.text = Utils.monoDigits(dateTime.getHour(date));
+  timeMinute.text = Utils.monoDigits(date.getMinutes());
+  largeGraphTime.text = dateTime.getTime(date, preferences.clockDisplay);
+  dateElement.text = dateTime.getDate(date, null, true);
+}
+
+function updateHeartRate(heartrate) {
+  console.log("app - updateHeartRate()");
+  if (heartrate) {
+    heart.text = heartrate;
+  }
+}
+
+function updateCalories(calorieCount) {
+  calories.text = Utils.commas(calorieCount);
+}
+
+function updateSteps(stepCount) {
+  steps.text = Utils.commas(stepCount);
+}
+
+function updateBattery(battery) {
+  batteryLevel.width = battery.level;
+  batteryLevel.style.fill = battery.color;
+  batteryPercent.text = "" + battery.percent + "%";
 }
 
 /**
@@ -252,20 +318,3 @@ function hideLargeGraph() {
   resetHideGraphTimer(false);
 }
 
-timeHour.onclick = forceRefresh;
-timeMinute.onclick = forceRefresh;
-largeGraphTime.onclick = forceRefresh;
-largeGraphsSgv.onclick = forceRefresh;
-
-goToLargeGraph.onclick = showLargeGraph;
-exitLargeGraph.onclick = hideLargeGraph;
-
-// wait 2 seconds
-setTimeout(function () {
-  transfer.send(dataToSend);
-}, 1500);
-setInterval(function () {
-  transfer.send(dataToSend);
-}, 180000);
-
-//<div>Icons made by <a href="http://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div><div>Icons made by <a href="https://www.flaticon.com/authors/designerz-base" title="Designerz Base">Designerz Base</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div><div>Icons made by <a href="https://www.flaticon.com/authors/twitter" title="Twitter">Twitter</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>

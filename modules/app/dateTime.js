@@ -14,32 +14,33 @@
 import { preferences, locale } from "user-settings";
 
 export default class dateTime {
-  getDate(dateFormat, enableDOW) {
-    console.log("app - dateTime - getDate()");
-    let dateObj = new Date();
-    let month = ("0" + (dateObj.getMonth() + 1)).slice(-2);
-    let date = ("0" + dateObj.getDate()).slice(-2);
-    let year = dateObj.getFullYear();
+  getDate(date, dateFormat, enableDOW) {
+    if (date == null) {
+      date = new Date();
+    }
+    let month = ("0" + (date.getMonth() + 1)).slice(-2);
+    let day = ("0" + date.getDate()).slice(-2);
+    let year = date.getFullYear();
     const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
     if (enableDOW) {
       year = year.toString().substr(-2);
     }
 
-    let shortDate = month + "/" + date + "/" + year;
+    let shortDate = month + "/" + day + "/" + year;
 
     if (dateFormat) {
       if (dateFormat == "DD/MM/YYYY") {
-        shortDate = date + "/" + month + "/" + year;
+        shortDate = day + "/" + month + "/" + year;
       } else if (dateFormat == "YYYY/MM/DD") {
-        shortDate = year + "/" + month + "/" + date;
+        shortDate = year + "/" + month + "/" + day;
       } else if (dateFormat == "DD.MM.YYYY") {
-        shortDate = date + "." + month + "." + year;
+        shortDate = day + "." + month + "." + year;
       }
     }
 
     if (enableDOW) {
-      shortDate += " " + days[dateObj.getDay()];
+      shortDate += " " + days[date.getDay()];
     }
     return shortDate;
   }
@@ -49,7 +50,6 @@ export default class dateTime {
   }
 
   getTime(value, timeFormat) {
-    console.log("app - dateTime - getTime()");
     var time = new Date(value);
     var hh = time.getHours();
     var mm = time.getMinutes();
@@ -65,25 +65,26 @@ export default class dateTime {
     return ret;
   }
 
-  getHour() {
-    console.log("app - dateTime - getHour()");
-    var timeNow = new Date();
-    var hh = timeNow.getHours();
+  getHour(date) {
+    if (date == null) {
+      date = new Date();
+    }
+    var hh = date.getHours();
     if (preferences.clockDisplay === "12h") {
       hh = hh % 12 || 12;
     }
     return hh;
   }
 
-  getMinute() {
-    console.log("app - dateTime - getMinute()");
-    var timeNow = new Date();
-    var mm = timeNow.getMinutes();
+  getMinute(date) {
+    if (date == null) {
+      date = new Date();
+    }
+    var mm = date.getMinutes();
     return ("0" + mm).slice(-2);
   }
 
   getTimeSenseLastSGV(sgvDateTime) {
-    console.log("app - dateTime - getTimeSenseLastSGV()");
     let currentTime = new Date();
     let lastSGVTime = new Date(sgvDateTime);
     let secondsDiff = (currentTime.getTime() - lastSGVTime.getTime()) / 1000;
