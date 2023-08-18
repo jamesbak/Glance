@@ -1,6 +1,3 @@
-import { settings } from "settings";
-import { XMLHttpRequest } from "xmlhttprequest";
-
 function mySettings(props) {
   return (
     <Page>
@@ -235,7 +232,7 @@ function mySettings(props) {
 
         {props.settings.bgColor ? (
           JSON.parse(props.settings.bgColor) == "#FFFFFF" ? (
-            <Section title={}>
+            <Section>
               <Text bold align="center">
                 Random Color Generator
               </Text>

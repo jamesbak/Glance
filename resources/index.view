@@ -1,128 +1,54 @@
-<svg id="glance">
+<svg id="jb-glance">
   
     <svg id="main">
-        <gradientRect id="bgColor" width="100%" height="100%" gradient-type="linear" gradient-x1="0" gradient-y1="20" gradient-x2="0" gradient-y2="100%-80" gradient-color1="#390263" gradient-color2="black" />
+        <gradientRect id="bgColor" width="100%" height="100%" gradient-type="linear" gradient-x1="0" gradient-y1="20" gradient-x2="0" gradient-y2="100%-80" gradient-color1="black" gradient-color2="black" />
         <rect id="battery-level" />
         <image class="battery-image" href="img/battery.png" fill="white" />
         <text text-anchor="start" class="text text-gray" id="batteryPercent">99</text>
-        <text text-anchor="start" class="text text-gray" id="weather">--</text>
-        <image href="img/degree.png" id="degreeIcon" />
         <text text-anchor="start" class="text text-gray" id="date" />
         <line stroke-width="4" id="errorLine" display="none" />
-        <text text-anchor="end" class="text text-gray" id="timeOfLastSgv" />
 
-        <image href="img/arrows/None.png" id="arrows" />
-        <text font-size="145" text-anchor="start" class="h1" id="time" pointer-events="visible" />
-        <text font-size="105" text-anchor="end" class="h2" id="sgv" pointer-events="all" />
-        <image class="stat-image" href="img/step.png" fill="white" id="stepIcon" />
-        <text text-anchor="start" class="text" id="steps" />
-        <image class="stat-image" href="img/heart.png" fill="white" id="heartIcon" />
-        <text text-anchor="start" class="text" id="heart" />
-        <text class="text" id="error" text-anchor="end">--</text>
-        <text class="text" id="calories" />
-        <image class="stat-image" href="img/calories3.png" fill="white" id="caloriesIcon" />
-        <!--<text class="text" id="iob" />
-        <image class="stat-image" href="img/syringe.png" fill="white" id="syringe" />-->      
-        
-         <!-- Alert -->
-         <svg id="popup" display="none">
-            <!-- Black background -->
-            <rect class="full-size" fill="fb-black" />
-            <!-- Title and text -->
-            <!-- <use href="#mixed-text-center-mid" class="dialog-mixed-text" id="alertHeader">
-                <set href="#top-padding" attributeName="display" to="none" />
-                <set href="#header/text" attributeName="fill" to="fb-magenta" />
-                <set href="#copy/text" attributeName="text-buffer" to="Check blood sugar!" />
-                <set href="#header/text" attributeName="text-length" to="128" />
-                <set href="#bottom-padding" attributeName="display" to="none" />
-            </use> -->
-            <text font-size="75" display="none" text-anchor="middle" id="popup-title" class="h2 text-gray">--</text>
-            <image href="img/arrows/None.png" id="alertArrows"/>
-            <!-- Right button -->
-            <!-- <use id="dismiss" class="dialog-half-button-left" href="#square-button-negative">
-                <set href="#text" attributeName="text-buffer" to="Dismiss" />
-                <set href="#text" attributeName="text-anchor" to="middle" />
-            </use> -->
-            <use id="dismiss" href="#text-button">
-                <set href="#text" attributeName="text-buffer" to="Dismiss" />
-            </use>
-        </svg>
-        <!-- End Alert -->
-      
-        <!-- Graph -->
-        <svg id="graph">
-            <line class="highLine" x1="0" y1="40%+1" x2="95%" y2="40%+1" fill="#FFA500" stroke-width="1" />
-            <line class="meanLine" x1="0" y1="100%+4" x2="95%" y2="100%+4" fill="#616161" stroke-width="1" />
-            <line class="lowLine" x1="0" y1="100%+4" x2="95%" y2="100%+4" fill="#de4430" stroke-width="1" />
+        <text text-anchor="start" class="time" id="time-hour" pointer-events="visible" />
+        <text text-anchor="start" class="time" id="time-minute" pointer-events="visible" />
            
-            <!-- <use id="goToLargeGraph" class="dialog-half-button-right" href="#square-button-negative" opacity="0">
-              <set href="#text" attributeName="text-buffer" to="" />
-              <set href="#text" attributeName="text-anchor" to="middle" />
-            </use> -->
-            <use id="goToLargeGraph" href="#text-button"  opacity="0">
-                <set href="#text" attributeName="text-buffer" to="" />
-            </use>
-            <text id="high" class="xs-text" text-anchor="end" />
-            <text id="low" class="xs-text" text-anchor="end" />
-            <circle class="graphPoints" cx="4%" cy="50%" r="3" />
-            <circle class="graphPoints" cx="8%" cy="50%" r="3" />
-            <circle class="graphPoints" cx="12%" cy="50%" r="3" />
-            <circle class="graphPoints" cx="16%" cy="50%" r="3" />
-            <circle class="graphPoints" cx="20%" cy="50%" r="3" />
-            <circle class="graphPoints" cx="24%" cy="50%" r="3" />
-            <circle class="graphPoints" cx="28%" cy="50%" r="3" />
-            <circle class="graphPoints" cx="32%" cy="50%" r="3" />
-            <circle class="graphPoints" cx="36%" cy="50%" r="3" />
-            <circle class="graphPoints" cx="40%" cy="50%" r="3" />
-            <circle class="graphPoints" cx="44%" cy="50%" r="3" />
-            <circle class="graphPoints" cx="48%" cy="50%" r="3" />
-            <circle class="graphPoints" cx="52%" cy="50%" r="3" />
-            <circle class="graphPoints" cx="56%" cy="50%" r="3" />
-            <circle class="graphPoints" cx="60%" cy="50%" r="3" />
-            <circle class="graphPoints" cx="64%" cy="50%" r="3" />
-            <circle class="graphPoints" cx="68%" cy="50%" r="3" />
-            <circle class="graphPoints" cx="72%" cy="50%" r="3" />
-            <circle class="graphPoints" cx="76%" cy="50%" r="3" />
-            <circle class="graphPoints" cx="80%" cy="50%" r="3" />
-            <circle class="graphPoints" cx="84%" cy="50%" r="3" />
-            <circle class="graphPoints" cx="88%" cy="50%" r="3" />
-            <circle class="graphPoints" cx="92%" cy="50%" r="3" />
-            <circle class="graphPoints" cx="96%" cy="50%" r="3" />
+        <image class="stat-image" href="img/steps_36px.png" fill="lightblue" id="stepIcon" />
+        <text class="stat-text text" id="steps" />
+        <image class="stat-image" href="img/heart_rate_36px.png" fill="#DF7468" id="heartIcon" />
+        <text class="stat-text text" id="heart" />
+        <image class="stat-image" href="img/calories_36px.png" fill="lightyellow" id="caloriesIcon" /> 
+        <text class="stat-text text" id="calories" />
+        
+        <text class="text" id="error" text-anchor="end" display="none">-</text>
+        <text class="text text-gray" id="timeOfLastSgv" />
+        <image href="img/arrows/None.png" id="arrows" />
+        <text text-anchor="end" pointer-events="all" id="sgv" />
 
-        </svg>
-        <!-- End Graph -->
+        <use id="goToLargeGraph" href="#text-button"  opacity="0">
+            <set href="#text" attributeName="text-buffer" to="" />
+        </use>        
     </svg>
   
     <svg id="largeGraphView" display="none">
-        <gradientRect id ="largeGraphBgColor" width="100%" height="100%" gradient-type="linear" gradient-x1="0" gradient-y1="20" gradient-x2="0" gradient-y2="100%-80" gradient-color1="#390263" gradient-color2="black" />
-        <text font-size="75" class="h2" id="largeGraphsSgv"/>
+        <gradientRect id ="largeGraphBgColor" width="100%" height="100%" gradient-type="linear" gradient-x1="0" gradient-y1="20" gradient-x2="0" gradient-y2="100%-80" gradient-color1="black" gradient-color2="black" />
+        <text class="h2" font-size="60" pointer-events="visible" id="largeGraphsSgv"/>
         <line stroke-width="4" id="largeGraphErrorLine" display="none" />
         <text text-anchor="end" class="text text-gray" id="largeGraphDelta" />
         <image href="img/arrows/None.png" id="largeGraphArrows"/>
         <text text-anchor="end" class="text text-gray" id="largeGraphTimeOfLastSgv" />
-       
-        <text text-anchor="end" class="text text-gray" id="rawbg"/>
 
-        <text class="text text-gray" id="largeGraphCob"/>
-        <image class="stat-image" href="img/hamburger.png" fill="white" id="largeGraphHamburger" />
-
-        <text class="text text-gray" id="largeGraphIob" />
-        <image class="stat-image" href="img/syringe.png" fill="white" id="largeGraphSyringe" />
-
-        <text class="text text-gray" id="tempBasal"/>
-    
-        <text class="text text-gray" id="predictedBg"/>
-      
-        <text text-anchor="middle" class="h3 text-gray" id="largeGraphTime" />
+        <text text-anchor="middle" class="text text-gray" pointer-events="visible" id="largeGraphTime" />
 
         <svg id="largeGraph">
             <line class="highLine" x1="0" y1="40%+1" x2="95%" y2="40%+1" fill="#FFA500" stroke-width="1" />
             <line class="meanLine" x1="0" y1="100%+4" x2="95%" y2="100%+4" fill="#616161" stroke-width="1" />
             <line class="lowLine" x1="0" y1="100%+4" x2="95%" y2="100%+4" fill="#de4430" stroke-width="1" />
-            
  
             <text id="largeGraphHigh" class="xs-text" text-anchor="end" />
             <text id="largeGraphLow" class="xs-text" text-anchor="end" />
+
+            <text id="largeGraphTimeStart" class="xs-text" text-anchor="start">00:00</text>
+            <text id="largeGraphTimeMiddle" class="xs-text" text-anchor="middle">00:00</text>
+            <text id="largeGraphTimeEnd" class="xs-text" text-anchor="end">00:00</text>
           
             <circle class="largeGraphGraphPoints" cx="4%" cy="50%" r="3" />
             <circle class="largeGraphGraphPoints" cx="6%" cy="50%" r="3" />
@@ -172,14 +98,9 @@
             <circle class="largeGraphGraphPoints" cx="94%" cy="50%" r="3" />
             <circle class="largeGraphGraphPoints" cx="96%" cy="50%" r="3" />
         </svg>
-        <text class="text text-gray" id="largeGraphLoopStatus"/>
         <use id="exitLargeGraph" href="#text-button"  opacity="0">
             <set href="#text" attributeName="text-buffer" to="" />
         </use>
-        <!-- <use id="exitLargeGraph" class="dialog-half-button-right" href="#square-button-negative" opacity="0">
-           <set href="#text" attributeName="text-buffer" to="" />
-           <set href="#text" attributeName="text-anchor" to="middle" />
-        </use> -->
 
         <!-- End Graph -->
     </svg>   

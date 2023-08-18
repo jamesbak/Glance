@@ -38,7 +38,6 @@ const transfer = new Transfer();
 
 let main = document.getElementById("main");
 let sgv = document.getElementById("sgv");
-let tempBasal = document.getElementById("tempBasal");
 let largeGraphsSgv = document.getElementById("largeGraphsSgv");
 let largeGraphDelta = document.getElementById("largeGraphDelta");
 let timeOfLastSgv = document.getElementById("timeOfLastSgv");
@@ -66,10 +65,6 @@ let goToLargeGraph = document.getElementById("goToLargeGraph");
 
 let largeGraphView = document.getElementById("largeGraphView");
 let exitLargeGraph = document.getElementById("exitLargeGraph");
-
-let largeGraphSyringe = document.getElementById("largeGraphSyringe");
-let largeGraphHamburger = document.getElementById("largeGraphHamburger");
-let predictedBg = document.getElementById("predictedBg");
 
 let dismissHighFor = 120;
 let dismissLowFor = 15;
@@ -117,7 +112,7 @@ inbox.onnewfile = () => {
     fileName = inbox.nextFile();
     if (fileName) {
       dataFromCompanion = fs.readFileSync(fileName, "cbor");
-      update();
+      update(dataFromCompanion);
     }
   } while (fileName);
 };
@@ -134,10 +129,10 @@ updateNonBgMetrics(new Date(), true);
 // Timed refresh
 // wait 1 seconds
 setTimeout(() => transfer.send(dataToSend), 1000);
-// Refresh BSL every 3 minutes
-setInterval(() => transfer.send(dataToSend), 180000);
+// Refresh BSL every 5 minutes
+setInterval(() => transfer.send(dataToSend), 300000);
 
-function update() {
+function update(data) {
   console.log("app - update()");
   console.warn("JS memory: " + memory.js.used + "/" + memory.js.total);
 
@@ -147,23 +142,21 @@ function update() {
     steps: today.adjusted.steps,
   };
 
-  if (dataFromCompanion) {
+  if (data) {
     console.warn("GOT DATA");
 
-    dismissHighFor = dataFromCompanion.settings.dismissHighFor;
-    dismissLowFor = dataFromCompanion.settings.dismissLowFor;
+    dismissHighFor = data.settings.dismissHighFor;
+    dismissLowFor = data.settings.dismissLowFor;
 
     // colors
-    bgColor.gradient.colors.c1 = dataFromCompanion.settings.bgColor;
-    bgColor.gradient.colors.c2 = dataFromCompanion.settings.bgColorTwo;
+    bgColor.gradient.colors.c1 = data.settings.bgColor;
+    bgColor.gradient.colors.c2 = data.settings.bgColorTwo;
 
-    largeGraphBgColor.gradient.colors.c1 = dataFromCompanion.settings.bgColor;
-    largeGraphBgColor.gradient.colors.c2 = dataFromCompanion.settings.bgColorTwo;
+    largeGraphBgColor.gradient.colors.c1 = data.settings.bgColor;
+    largeGraphBgColor.gradient.colors.c2 = data.settings.bgColorTwo;
 
     // bloodsugars
-    let currentBgFromBloodSugars = getFistBgNonpredictiveBG(
-      dataFromCompanion.bloodSugars.bgs
-    );
+    let currentBgFromBloodSugars = getFistBgNonpredictiveBG(data.bloodSugars.bgs);
 
     sgv.text = currentBgFromBloodSugars.currentbg;
     largeGraphsSgv.text = currentBgFromBloodSugars.currentbg;
@@ -172,27 +165,14 @@ function update() {
     if (deltaText > 0) {
       deltaText = "+" + deltaText;
     }
-    largeGraphDelta.text = deltaText + " " + dataFromCompanion.settings.glucoseUnits;
-
-    if (currentBgFromBloodSugars.tempbasal) {
-      tempBasal.text = currentBgFromBloodSugars.tempbasal;
-    } else {
-      tempBasal.text = "";
-    }
-
-    if (currentBgFromBloodSugars.predictedbg) {
-      predictedBg.text = currentBgFromBloodSugars.predictedbg;
-    } else {
-      predictedBg.text = "";
-    }
-
+    largeGraphDelta.text = deltaText + " " + data.settings.glucoseUnits;
     timeOfLastSgv.text = dateTime.getTimeSenseLastSGV(currentBgFromBloodSugars.datetime)[0];
     largeGraphTimeOfLastSgv.text = dateTime.getTimeSenseLastSGV(currentBgFromBloodSugars.datetime)[0];
 
     let timeSenseLastSGV = dateTime.getTimeSenseLastSGV(currentBgFromBloodSugars.datetime)[1];
     alerts.check(
       currentBgFromBloodSugars,
-      dataFromCompanion.settings,
+      data.settings,
       true,
       timeSenseLastSGV
     );
@@ -203,10 +183,10 @@ function update() {
     largeGraphArrows.href = "../resources/img/arrows/" + currentBgFromBloodSugars.direction + ".png";
 
     graph.update(
-      dataFromCompanion.bloodSugars.bgs,
-      dataFromCompanion.settings.highThreshold,
-      dataFromCompanion.settings.lowThreshold,
-      dataFromCompanion.settings,
+      data.bloodSugars.bgs,
+      data.settings.highThreshold,
+      data.settings.lowThreshold,
+      data.settings,
       preferences.clockDisplay
     );
   } else {
