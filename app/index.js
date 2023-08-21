@@ -13,20 +13,21 @@
 
 import document from "document";
 import { inbox } from "file-transfer";
-import fs from "fs";
+import { readFileSync } from "fs";
 import { vibration } from "haptics";
 import { clock } from "clock";
 import { HeartRateSensor } from "heart-rate";
 import { display } from "display";
 import { today } from 'user-activity';
+import { charger } from "power";
+import { memory } from "system";
+import { preferences } from "user-settings";
 import DateTime from "../modules/app/dateTime.js";
 import BatteryLevels from "../modules/app/batteryLevels.js";
 import Graph from "../modules/app/bloodline.js";
 import Alerts from "../modules/app/alerts.js";
 import Errors from "../modules/app/errors.js";
 import Transfer from "../modules/app/transfer.js";
-import { memory } from "system";
-import { preferences } from "user-settings";
 import Utils from "../modules/app/util.js"
 
 const dateTime = new DateTime();
@@ -49,18 +50,15 @@ let timeMinute = document.getElementById("time-minute");
 let largeGraphTime = document.getElementById("largeGraphTime");
 let arrows = document.getElementById("arrows");
 let largeGraphArrows = document.getElementById("largeGraphArrows");
+let batteryImage = document.getElementById("battery-image");
 let batteryLevel = document.getElementById("battery-level");
 let steps = document.getElementById("steps");
-let stepIcon = document.getElementById("stepIcon");
 let heart = document.getElementById("heart");
-let heartIcon = document.getElementById("heartIcon");
 let calories = document.getElementById("calories");
-let caloriesIcon = document.getElementById("caloriesIcon");
 let bgColor = document.getElementById("bgColor");
 let largeGraphBgColor = document.getElementById("largeGraphBgColor");
 let batteryPercent = document.getElementById("batteryPercent");
 let errorText = document.getElementById("error");
-let degreeIcon = document.getElementById("degreeIcon");
 let goToLargeGraph = document.getElementById("goToLargeGraph");
 
 let largeGraphView = document.getElementById("largeGraphView");
@@ -77,6 +75,7 @@ let dataToSend = {
   heart: 0,
   steps: today.adjusted.steps,
 };
+let lastSGVTime = null;
 
 sgv.text = "---";
 largeGraphDelta.text = "";
@@ -89,20 +88,16 @@ clock.granularity = "seconds";
 clock.ontick = (evt) => {
   updateNonBgMetrics(evt.date, false);
 }
+charger.onchange = (evt) => {
+  updateBattery();
+}
 // Heart rate sensor
 const hrm = new HeartRateSensor({ frequency: 1 });
 hrm.addEventListener("reading", () => updateHeartRate(hrm.heartRate));
 hrm.start();
 // Turn some metrics off when the display isn't on
-display.addEventListener("change", () => {
-  // Automatically stop the sensor when the screen is off to conserve battery
-  display.on ? hrm.start() : hrm.stop();
-  clock.granularity = display.on ? "seconds" : "off";
-  // Refresh the display now
-  if (display.on) {
-    updateNonBgMetrics(new Date(), true);
-  }
-});
+display.addEventListener("change", () => updateDisplayStatus());
+
 // Data received from companion app
 inbox.onnewfile = () => {
   console.log("New file!");
@@ -110,8 +105,9 @@ inbox.onnewfile = () => {
   do {
     // If there is a file, move it from staging into the application folder
     fileName = inbox.nextFile();
+    console.log("Data file: " + fileName);
     if (fileName) {
-      dataFromCompanion = fs.readFileSync(fileName, "cbor");
+      dataFromCompanion = readFileSync(fileName, "cbor");
       update(dataFromCompanion);
     }
   } while (fileName);
@@ -166,18 +162,14 @@ function update(data) {
       deltaText = "+" + deltaText;
     }
     largeGraphDelta.text = deltaText + " " + data.settings.glucoseUnits;
-    timeOfLastSgv.text = dateTime.getTimeSenseLastSGV(currentBgFromBloodSugars.datetime)[0];
-    largeGraphTimeOfLastSgv.text = dateTime.getTimeSenseLastSGV(currentBgFromBloodSugars.datetime)[0];
-
-    let timeSenseLastSGV = dateTime.getTimeSenseLastSGV(currentBgFromBloodSugars.datetime)[1];
+    lastSGVTime = currentBgFromBloodSugars.datetime;
+    let lastBGTimespan = updateLastBGTime();
     alerts.check(
       currentBgFromBloodSugars,
       data.settings,
       true,
-      timeSenseLastSGV
+      lastBGTimespan
     );
-
-    errors.check(timeSenseLastSGV, currentBgFromBloodSugars.currentbg);
 
     arrows.href = "../resources/img/arrows/" + currentBgFromBloodSugars.direction + ".png";
     largeGraphArrows.href = "../resources/img/arrows/" + currentBgFromBloodSugars.direction + ".png";
@@ -200,7 +192,8 @@ function updateNonBgMetrics(date, force) {
   if (force || date.getSeconds() % 10 == 0) {
     console.log("app - updating clock");
     updateClock(date);
-    updateBattery(batteryLevels.get());
+    updateBattery();
+    updateLastBGTime();
   }
   if (force || today.adjusted.steps != currentSteps) {
     console.log("app - updating steps");
@@ -222,6 +215,16 @@ function updateClock(date) {
   dateElement.text = dateTime.getDate(date, null, true);
 }
 
+function updateDisplayStatus() {
+  // Automatically stop the sensor when the screen is off to conserve battery
+  display.on ? hrm.start() : hrm.stop();
+  clock.granularity = display.on ? "seconds" : "off";
+  // Refresh the display now
+  if (display.on) {
+    updateNonBgMetrics(new Date(), true);
+  }
+}
+
 function updateHeartRate(heartrate) {
   console.log("app - updateHeartRate()");
   if (heartrate) {
@@ -237,10 +240,31 @@ function updateSteps(stepCount) {
   steps.text = Utils.commas(stepCount);
 }
 
-function updateBattery(battery) {
-  batteryLevel.width = battery.level;
-  batteryLevel.style.fill = battery.color;
+let chargerActive = false;
+function updateBattery() {
+  var battery = batteryLevels.get();
+
+  if (battery.charger != chargerActive) {
+    console.warn("Charger state: " + battery.charger);
+    batteryImage.href = battery.charger ? "../resources/img/charger.png" : "../resources/img/battery.png";
+    batteryLevel.style.display = battery.charger ? "none" : "inline";
+    chargerActive = battery.charger;
+  }
+  if (!battery.charger) {
+    batteryLevel.width = battery.level;
+    batteryLevel.style.fill = battery.color;
+  }
   batteryPercent.text = "" + battery.percent + "%";
+}
+
+function updateLastBGTime() {
+  if (lastSGVTime) {
+    let lastBGTimeParts = dateTime.getTimeSenseLastSGV(lastSGVTime);
+    timeOfLastSgv.text = lastBGTimeParts[0];
+    errors.check(lastBGTimeParts[1]);
+    return lastBGTimeParts[1];
+  }
+  return 0;
 }
 
 /**

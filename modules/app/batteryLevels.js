@@ -11,9 +11,6 @@
  * ------------------------------------------------
  */
 
-
-
-
 import { charger, battery } from "power";
 
 export default class batteryLevels { 
@@ -31,6 +28,7 @@ export default class batteryLevels {
       percent: percent,
       level: level,
       color: color,
+      charger: charger.connected,
     }
   }
 };

@@ -14,6 +14,7 @@
 
 
 import document from "document";
+
 let errorLine = document.getElementById("errorLine");
 let largeGraphErrorLine = document.getElementById("largeGraphErrorLine");
 

@@ -3,7 +3,7 @@
     <svg id="main">
         <gradientRect id="bgColor" width="100%" height="100%" gradient-type="linear" gradient-x1="0" gradient-y1="20" gradient-x2="0" gradient-y2="100%-80" gradient-color1="black" gradient-color2="black" />
         <rect id="battery-level" />
-        <image class="battery-image" href="img/battery.png" fill="white" />
+        <image id="battery-image" class="battery-image" href="img/battery.png" fill="white" />
         <text text-anchor="start" class="text text-gray" id="batteryPercent">99</text>
         <text text-anchor="start" class="text text-gray" id="date" />
         <line stroke-width="4" id="errorLine" display="none" />

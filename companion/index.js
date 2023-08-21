@@ -56,12 +56,12 @@ async function sendData() {
     let dexcomPassword = store.dexcomPassword
       ? store.dexcomPassword.replace(/\s+/g, "")
       : "";
-    let sessionId = await dexcom.getSessionId(
-      dexcomUsername,
-      dexcomPassword,
-      subDomain
-    );
     if (store.dexcomUsername && store.dexcomPassword) {
+      let sessionId = await dexcom.getSessionId(
+        dexcomUsername,
+        dexcomPassword,
+        subDomain
+      );
       bloodsugars = await dexcom.getData(sessionId, subDomain);
     } else {
       bloodsugars = {
