@@ -105,8 +105,8 @@ inbox.onnewfile = () => {
   do {
     // If there is a file, move it from staging into the application folder
     fileName = inbox.nextFile();
-    console.log("Data file: " + fileName);
     if (fileName) {
+      console.log("Data file: " + fileName);
       dataFromCompanion = readFileSync(fileName, "cbor");
       update(dataFromCompanion);
     }
@@ -190,18 +190,15 @@ let currentSteps = 0;
 let currentCalories = 0;
 function updateNonBgMetrics(date, force) {
   if (force || date.getSeconds() % 10 == 0) {
-    console.log("app - updating clock");
     updateClock(date);
     updateBattery();
     updateLastBGTime();
   }
   if (force || today.adjusted.steps != currentSteps) {
-    console.log("app - updating steps");
     updateSteps(today.adjusted.steps);
     currentSteps = today.adjusted.steps;
   }
   if (force || today.adjusted.calories != currentCalories) {
-    console.log("app - updating calories");
     updateCalories(today.adjusted.calories);
     currentCalories = today.adjusted.calories;
   }
@@ -225,10 +222,14 @@ function updateDisplayStatus() {
   }
 }
 
+let currentHeartRate = 0;
 function updateHeartRate(heartrate) {
-  console.log("app - updateHeartRate()");
-  if (heartrate) {
-    heart.text = heartrate;
+  if (heartrate != currentHeartRate) {
+    console.log("app - updateHeartRate(): " + heartrate);
+    if (heartrate) {
+      heart.text = heartrate;
+    }
+    currentHeartRate = heartrate;
   }
 }
 
@@ -282,7 +283,7 @@ function getFistBgNonpredictiveBG(bgs) {
 
 let hideGraphTimer = 0;
 
-function resetHideGraphTimer(restart = true) {
+function resetHideGraphTimer(restart) {
   console.log("app - **** resetHideGraphTimer ***");
   if (hideGraphTimer) {
     clearTimeout(hideGraphTimer);
@@ -301,7 +302,6 @@ function forceRefresh(e) {
   vibration.start("bump");
   arrows.href = "../resources/img/arrows/loading.png";
   largeGraphArrows.href = "../resources/img/arrows/loading.png";
-  resetHideGraphTimer();
 }
 
 function showLargeGraph() {
@@ -310,7 +310,7 @@ function showLargeGraph() {
   largeGraphView.style.display = "inline";
   main.style.display = "none";
   goToLargeGraph.style.display = "none";
-  resetHideGraphTimer();
+  resetHideGraphTimer(true);
 }
 
 function hideLargeGraph() {

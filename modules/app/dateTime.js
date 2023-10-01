@@ -11,7 +11,7 @@
  * ------------------------------------------------
  */
 
-import { preferences, locale } from "user-settings";
+import { preferences } from "user-settings";
 
 export default class dateTime {
   getDate(date, dateFormat, enableDOW) {

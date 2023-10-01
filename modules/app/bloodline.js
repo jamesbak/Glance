@@ -13,7 +13,6 @@
 
 
 
-import { me as device } from "device";
 import document from "document";
 import DateTime from "./dateTime.js";
 

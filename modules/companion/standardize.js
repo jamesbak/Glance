@@ -39,41 +39,8 @@ export default class standardize {
 		let loopStatus = '';
 		let upbat = '';
 		let sage = ''
-		logs.add(`BGS: ${bgs} !data.error: ${!data.error} data: ${data} bgs !== 'undefined': ${bgs !== 'undefined'}`);
 		if (bgs && !data.error && data && bgs !== 'undefined') {
-			if (settings.dataSource === 'nightscout') {
-				bgs = data.bgs;
-				// SPIKE WORK AROUND 
-				// this check is here for old versions of spike where the /pebble endpoint was returning mmol svg data 
-				if (bgs[0].sgv < 25) {
-					bgs.forEach((bg) => {
-						bg.sgv = mgdl(bg.sgv)
-					});
-					bgs[0].bgdelta = mgdl(bgs[0].bgdelta)
-				} // END OF SPIKE WORK AROUND
-
-				let standardizedExtraData = standardizeExtraData(bgs, extraData, settings);
-				bgs = standardizedExtraData.bgs;
-				rawbg = standardizedExtraData.rawbg;
-				tempBasal = standardizedExtraData.tempBasal;
-				predictedBg = standardizedExtraData.predictedBg;
-				loopStatus = standardizedExtraData.loopStatus;
-				upbat = standardizedExtraData.upbat;
-        		sage = standardizedExtraData.sage;
-				// add any extra data
-			} else if (settings.dataSource === 'xdrip') { // xdrip using the sgv endpoint still
-				bgs = data;
-				if (Array.isArray(bgs)) {
-					bgs[0].datetime = bgs[0].date;
-					bgs[0].bgdelta = bgs[0].sgv - bgs[1].sgv; //element.delta;
-				} else {
-					bgs = null;
-				}
-			} else if (settings.dataSource === 'spike') {
-				bgs = data.bgs;
-			} else if (settings.dataSource === 'custom') {
-				bgs = data.bgs;
-			} else if (settings.dataSource === 'dexcom') {
+			if (settings.dataSource === 'dexcom') {
 				let bgsTemplate = {
 					bgs: [{
 							sgv: '120',
@@ -238,45 +205,32 @@ export default class standardize {
 					bgsTemplate.bgs[index].datetime = parseInt(dateTime);
 
 					if (index === 0) {
-
 						let delta = (bgs[0].Value - bgs[1].Value);
 						// Set values to template
 						bgsTemplate.bgs[index].direction = bgs[0].Trend //slopeDirection(bgs[0].Trend);
 						bgsTemplate.bgs[index].bgdelta = delta;
 					}
-				})
-        logs.add("Standardized dexcom data "+ bgsTemplate.bgs)
+				});
 				bgs = bgsTemplate.bgs;
-			} else if (settings.dataSource === 'tomato') { // tomato
-				bgs = data.bgs;
-				if (Array.isArray(bgs)) {
-					bgs[0].datetime = bgs[0].date;
-					bgs[0].bgdelta = bgs[0].sgv - bgs[1].sgv; //element.delta;
-				} else {
-					bgs = null;
-				}
 			}
-
-			
 			// Look for current non Predictive bg and not the last 5 predictions
 			// this works because only the current bg has a delta so we can filter for it
 			let nonPredictiveBg = bgs.filter(bg => bg.bgdelta)[0];
 
-      let hasFoundFirstDelta = false;
+			let hasFoundFirstDelta = false;
 			bgs.forEach((bg) => {
 				if (bg.bgdelta != null && !hasFoundFirstDelta) {
 					nonPredictiveBg = bg;
 					hasFoundFirstDelta = true;
 				}
-			})
-      console.log(nonPredictiveBg)
+			});
 			// Look at the data that we are getting and if the SGV is below 25 we know the unit type is mmol
 			if (nonPredictiveBg.sgv < 25) {
 				bgs.forEach((bg) => {
 					bg.sgv = mgdl(bg.sgv)
 				});
 				nonPredictiveBg.bgdelta = mgdl(nonPredictiveBg.bgdelta)
-			}
+			};
 
 			let currentBG = nonPredictiveBg.sgv;
 
@@ -301,24 +255,23 @@ export default class standardize {
 				return temp;
 			});
 
-
 			// The only BG that will have a bgdelta will be the current one
 			// Add other important info to current bg in sgv array
 			cleanedBgs.map((bg) => {
 				if (bg.bgdelta != null) {
 					// any values put here will be able to be entered in the layout
 					bg.sgv = bg.sgv;
-          if(bg.iob) { 
-            bg.iob = Math.round((Number(bg.iob) + 0.00001) * 100) / 100 //parseInt(bg.iob, 10).toFixed(1);
-          } else {
-             bg.iob = 0;
-          }
-          if(bg.cob) {
-             bg.cob =  Math.round((Number(bg.cob, 10) + 0.00001) * 100) / 100
-          } else {
-             bg.cob = 0;
-          }
-          bg.datetime = nonPredictiveBg.datetime;
+					if (bg.iob) { 
+						bg.iob = Math.round((Number(bg.iob) + 0.00001) * 100) / 100 //parseInt(bg.iob, 10).toFixed(1);
+					} else {
+						bg.iob = 0;
+					}
+					if (bg.cob) {
+						bg.cob =  Math.round((Number(bg.cob, 10) + 0.00001) * 100) / 100
+					} else {
+						bg.cob = 0;
+					}
+					bg.datetime = nonPredictiveBg.datetime;
 					bg.direction = nonPredictiveBg.direction;
 					bg.rawbg = ((rawbg && rawbg !== '0.0') ? (rawbg + ' raw') : '');
 					bg.tempbasal = tempBasal;
@@ -346,9 +299,7 @@ export default class standardize {
 			// console.warn(sizeof.size(cleanedBgs) + ' bytes')
 			// console.warn(sizeof.size(JSON.stringify(cleanedBgs)) + ' bytes')
 
-
 			return returnBloodsugars;
-			//}
 		}
 		logs.add('Line 63: here reurning error')
 		let currentTime = new Date();
