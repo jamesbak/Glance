@@ -16,7 +16,6 @@ import { inbox } from "file-transfer";
 
 import Settings from "../modules/companion/settings.js";
 import Transfer from "../modules/companion/transfer.js";
-import Fetch from "../modules/companion/fetch.js";
 import Standardize from "../modules/companion/standardize.js";
 import Logs from "../modules/companion/logs.js";
 import Sizeof from "../modules/companion/sizeof.js";
@@ -64,7 +63,7 @@ async function sendData() {
     }
   }
   catch (e) {
-    console.error("Error retrieving lastest BSL values. ", e);
+    logs.error("Error retrieving lastest BSL values. ", e);
   }
   if (!bloodsugars) {
     bloodsugars = {
@@ -114,7 +113,7 @@ async function processRequest() {
       await sendData();
     }
     catch (e) {
-      console.error("Error retrieving latest BSL and sending to watch.", e);
+      logs.error("Error retrieving latest BSL and sending to watch.", e);
     }
     // Drain the queue
     while (fileItem) {

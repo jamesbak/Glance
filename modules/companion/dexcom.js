@@ -44,7 +44,7 @@ export default class dexcom {
       err = new Error("Error from Dexcom login operation: " + JSON.stringify(await response.json()));
     }
     catch (e) {
-      console.error("Error logging in to Dexcom API.", e);
+      logs.error("Error logging in to Dexcom API.", e);
       throw e;
     }
     throw err;
@@ -85,7 +85,7 @@ export default class dexcom {
       err = new Error("Error received from Dexcom getsessionid operation: " + JSON.stringify(await response.json()));
     }
     catch (e) {
-      console.error("Dexcom getsessionid error: ", e);
+      logs.error("Dexcom getsessionid error: ", e);
       throw e;
     }
     throw err;
@@ -117,7 +117,7 @@ export default class dexcom {
       err = new Error("Error recevied form Dexcom getlastestvalues operaton: " + JSON.stringify(await response.json()));
     }
     catch (e) {
-      console.error("Dexcom get latest glucose values error: ", e);
+      logs.error("Dexcom getlatestglucosevalues error: ", e);
       throw e;
     }
     throw err;
