@@ -21,12 +21,12 @@ const sizeof = new Sizeof();
 export default class logs {
   add(value) {
     console.log(value);
-    _addLogEntry(value);
+    this._addLogEntry(value);
   }
 
   error(message, err) {
     console.error(message, err);
-    _addLogEntry(message + err.message);
+    this._addLogEntry(message + err.message);
   }
 
   _addLogEntry(value) {
