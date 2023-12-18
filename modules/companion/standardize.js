@@ -25,12 +25,7 @@ export default class standardize {
 	// datetime:
 	// bgdelta:
 	bloodsugars(data, extraData, settings) {
-		logs.add('companion - standardize - bloodsugars()')
 		logs.add(`data: ${JSON.stringify(data)}}`);
-		logs.add(`extraData ${JSON.stringify(extraData)}`);
-		settings.dexcomUsername = '';
-		settings.dexcomPassword = '';
-		logs.add(`settings ${JSON.stringify(settings)}`);
 
 		let bgs = data;
 		let rawbg = '';
@@ -288,23 +283,14 @@ export default class standardize {
 				return bg;
 			});
 
-			//logs.add('Line 151:  companion - standardize cleanedBgs' + JSON.stringify(cleanedBgs))
-
 			let returnBloodsugars = {
 				bgs: cleanedBgs,
 			}
 
-			// console.warn(sizeof.size(returnBloodsugars) + ' bytes')
-			// logs.add(JSON.stringify(cleanedBgs))
-			// console.warn(sizeof.size(cleanedBgs) + ' bytes')
-			// console.warn(sizeof.size(JSON.stringify(cleanedBgs)) + ' bytes')
-
 			return returnBloodsugars;
 		}
-		logs.add('Line 63: here reurning error')
 		let currentTime = new Date();
-		console.error("currentTime---------------------------")
-		console.error(currentTime)
+		console.log(currentTime)
 		return {
 			bgs: [{
 					sgv: '120',
@@ -460,7 +446,6 @@ export default class standardize {
 		}
 	}
 	settings(settings) {
-		logs.add('Line 212: companion - standardize - settings()');
 		// Convert any values to desired units type 
 		if (settings.glucoseUnits === 'mmol') {
 			settings.highThreshold = mgdl(settings.highThreshold);
@@ -643,7 +628,6 @@ function checkLoopStatus(status) {
 
 // Check The time in betweek each SGV and add LOS value if time is greater then 5 minutes 
 function checkTimeBetweenGraphPoints(bgs, firstNonPredictiveBg) {
-	logs.add('Line 478: companion - standardize - checkTimeBetweenGraphPoints');
   let firstRun = true;
   let firstNonPredictiveBgIndex = bgs.indexOf(firstNonPredictiveBg);
 

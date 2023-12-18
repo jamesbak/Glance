@@ -99,19 +99,8 @@ hrm.start();
 display.addEventListener("change", () => updateDisplayStatus());
 
 // Data received from companion app
-inbox.onnewfile = () => {
-  console.log("New file!");
-  let fileName;
-  do {
-    // If there is a file, move it from staging into the application folder
-    fileName = inbox.nextFile();
-    if (fileName) {
-      console.log("Data file: " + fileName);
-      dataFromCompanion = readFileSync(fileName, "cbor");
-      update(dataFromCompanion);
-    }
-  } while (fileName);
-};
+inbox.onnewfile = processReceivedData;
+
 // User interaction - force refresh & show graph
 timeHour.onclick = forceRefresh;
 timeMinute.onclick = forceRefresh;
@@ -125,12 +114,12 @@ updateNonBgMetrics(new Date(), true);
 // Timed refresh
 // wait 1 seconds
 setTimeout(() => transfer.send(dataToSend), 1000);
-// Refresh BSL every 5 minutes
-setInterval(() => transfer.send(dataToSend), 300000);
+// Schedule BSL every 5 minutes
+setInterval(() => transfer.send(dataToSend), 5 * 60 * 1000);
 
 function update(data) {
   console.log("app - update()");
-  console.warn("JS memory: " + memory.js.used + "/" + memory.js.total);
+  console.log("JS memory: " + memory.js.used + "/" + memory.js.total);
 
   // Data to send back to phone
   dataToSend = {
@@ -139,7 +128,7 @@ function update(data) {
   };
 
   if (data) {
-    console.warn("GOT DATA");
+    console.log("SGV data received from companion");
 
     dismissHighFor = data.settings.dismissHighFor;
     dismissLowFor = data.settings.dismissLowFor;
@@ -246,7 +235,7 @@ function updateBattery() {
   var battery = batteryLevels.get();
 
   if (battery.charger != chargerActive) {
-    console.warn("Charger state: " + battery.charger);
+    console.log("Charger state: " + battery.charger);
     batteryImage.href = battery.charger ? "../resources/img/charger.png" : "../resources/img/battery.png";
     batteryLevel.style.display = battery.charger ? "none" : "inline";
     chargerActive = battery.charger;
@@ -266,6 +255,19 @@ function updateLastBGTime() {
     return lastBGTimeParts[1];
   }
   return 0;
+}
+
+function processReceivedData() {
+  let fileName;
+  do {
+    // If there is a file, move it from staging into the application folder
+    fileName = inbox.nextFile();
+    if (fileName) {
+      console.log("Data file: " + fileName);
+      dataFromCompanion = readFileSync(fileName, "cbor");
+      update(dataFromCompanion);
+    }
+  } while (fileName);
 }
 
 /**

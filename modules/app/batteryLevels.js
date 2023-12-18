@@ -15,8 +15,8 @@ import { charger, battery } from "power";
 
 export default class batteryLevels { 
   get() {
-    console.log('app - batteryLevels - get()')
-    let percent = Math.floor(battery.chargeLevel)
+    let percent = Math.floor(battery.chargeLevel);
+    console.log('app - batteryLevels.get(): ' + percent + ', ' + charger.connected);
     let level = .3 * percent;
     let color = '#75bd78';
     if(percent <= 30 && percent >= 15) {

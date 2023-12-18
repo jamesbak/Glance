@@ -11,19 +11,17 @@
  * ------------------------------------------------
  */
 
-
-
 import Logs from "./logs.js";
-const logs = new Logs();
  // This module handles all messaging protocols
 import { outbox } from "file-transfer";
 import { encode } from 'cbor';
-import * as messaging from "messaging";
+
+const logs = new Logs();
 
 export default class transfer { 
   // Send data to the watchface
-  send(data) {
-   logs.add('Line 19: companion - transfer - send()')
-   outbox.enqueue("responce2.json", encode(data));
+  async send(data) {
+    logs.add('Line 19: companion - transfer - send()')
+    await outbox.enqueue("response.cbor", encode(data));
   }
 };

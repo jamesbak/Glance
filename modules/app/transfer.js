@@ -11,50 +11,16 @@
  * ------------------------------------------------
  */
 
-
-
 // Import the messaging module
-import * as messaging from "messaging";
+import { outbox } from "file-transfer";
+import { encode } from 'cbor';
 
 export default class transfer { 
   // Send data
   send(data) {
-    console.log('app - transfer - send. Peer socket state: ' + messaging.peerSocket.readyState);
-    if (messaging.peerSocket.readyState === messaging.peerSocket.OPEN) {
-      // Send a command to the companion
-      messaging.peerSocket.send({
-        command: 'forceCompanionTransfer',
-        data: data,
-    });
-    }
+    console.log("Sending request to companion: " + JSON.stringify(data));
+    outbox.enqueue("request.cbor", encode(data));
   }
 };
-
-
-// Events
-
-// // Listen for the onopen event
-messaging.peerSocket.onopen = function() {
-  // Fetch weather when the connection opens
-  console.log("Peer socket opened with companion")
-}
-
-messaging.peerSocket.onclose = function(evt) {
-  // Fetch weather when the connection opens
-  console.warn("Peer socket closed. Code: " + evt.code + ", reason: " + evt.reason + ", wasClean: " + evt.wasClean);
-}
-
-// Listen for the onerror event
-messaging.peerSocket.onerror = function(err) {
-  // Handle any errors
-  console.warn("Connection error: " + err.code + " - " + err.message);
-}
-
-// Listen for messages from the companion
-// messaging.peerSocket.onmessage = function(evt) {
-//   if (evt.data) {
-//   console.log("The temperature is: " + evt.data.temperature);
-//   }
-// }
 
 

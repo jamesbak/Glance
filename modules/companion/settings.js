@@ -16,7 +16,7 @@ import Logs from "./logs.js";
 const logs = new Logs();
 
 export default class settings {
-  get(dataReceivedFromWatch) {
+  get() {
     let queryParms = "?count=47";
     logs.add("companion - settings - get()");
     let dataSource = null;
@@ -88,10 +88,6 @@ export default class settings {
         nightscoutSiteHost +
         "/api/v2/properties";
     } else if (dataSource === "xdrip") {
-      // xDrip+
-      if (dataReceivedFromWatch && dataReceivedFromWatch != null) {
-        queryParms = `?count=47&steps=${dataReceivedFromWatch.steps}&heart=${dataReceivedFromWatch.heart}`;
-      }
       // Include data even if not from the current sensor (e.g. if there's no sensor)
       queryParms += "&all_data=true";
       url = "http://127.0.0.1:17580/sgv.json" + queryParms;
@@ -218,7 +214,7 @@ export default class settings {
       );
     }
 
-    let bgColor = null;
+    let bgColor = "#000000";
     let bgColorTwo = "#000000";
     if (settingsStorage.getItem("bgColor")) {
       bgColor = validateHexCode(JSON.parse(settingsStorage.getItem("bgColor")));
@@ -392,11 +388,9 @@ export default class settings {
 
     let dexcomUsername = null;
     if (settingsStorage.getItem("dexcomUsername")) {
-      console.log(settingsStorage.getItem("dexcomUsername"));
       dexcomUsername = JSON.parse(settingsStorage.getItem("dexcomUsername"))
         .name;
     } else if (!dexcomUsername) {
-      dexcomUsername = null;
       settingsStorage.setItem(
         "dexcomUsername",
         JSON.stringify({ name: dexcomUsername })
@@ -405,11 +399,9 @@ export default class settings {
 
     let dexcomPassword = null;
     if (settingsStorage.getItem("dexcomPassword")) {
-      console.log(settingsStorage.getItem("dexcomPassword"));
       dexcomPassword = JSON.parse(settingsStorage.getItem("dexcomPassword"))
         .name;
     } else if (!dexcomPassword) {
-      dexcomPassword = null;
       settingsStorage.setItem(
         "dexcomPassword",
         JSON.stringify({ name: dexcomPassword })
@@ -511,9 +503,7 @@ function isURL(s) {
 
 function validateHexCode(code, text) {
   var isOk = /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(code);
-  console.log(isOk);
   if (isOk) {
-    logs.add("companion - validateHexCode - Hex code valid");
     return code;
   }
   logs.add(
